@@ -1,11 +1,9 @@
 /*******************************************************************************
-@module rennderer-wt
+@module rennderer-patht
 
-@acronym wt ===> Whitted T. (1979) An improved illumination model for shaded
-display. Proceedings of the 6th annual conference on Computer Graphics and
-Interactive Techniques
+@abbreviation patht ==> path tracing
 
-@link tw method reference - https://en.wikipedia.org/wiki/J._Turner_Whitted
+@link path tracing reference - https://en.wikipedia.org/wiki/Path_tracing
 
 ==----------------------------------------------------------------------------==
 
@@ -33,10 +31,13 @@ SOFTWARE.
 *******************************************************************************/
 
 #include "../inc/prerequisites.hpp"
-
 #include "../inc/renderer.hpp"
 
-class RdrrWhittedT
+namespace Light
 {
-	
-};
+	class LIGHT_API RdrrPathTracing : public Renderer
+	{
+	public:
+		RdrrPathTracing();
+	};
+}

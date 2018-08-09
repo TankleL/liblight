@@ -30,11 +30,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 *******************************************************************************/
 
-#include "../inc/prerequisites.hpp"
+#include "api-dev-mod.hpp"
+#include "../inc/renderer-patht.hpp"
 
-#include "../inc/renderer.hpp"
+using namespace Light;
 
-class RdrrPathTracing
-{
-
-};
+RdrrPathTracing::RdrrPathTracing()
+{}
