@@ -1,5 +1,5 @@
 /* ****************************************************************************
-my-prerequisites.h
+texture2d.h
 -------------------------------------------------------------------------------
 
 Copyright (c) 2017, Tain L.
@@ -29,33 +29,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "../../../inc/prerequisites.hpp"
-#include <cmath>
-#include <algorithm>
+#include "prerequisites.hpp"
+#include "../tools/math/inc/mathinc.h"
 
 namespace Light
 {
-	namespace Math
+	class LIGHT_API Texture2D
 	{
+	public:
+		Texture2D(const Math::Resolution& resolution);
+		virtual ~Texture2D();
 
-#if ACCURACY_DOUBLE
-		typedef	double	decimal;
-		const static decimal epsilon = 1e-8;
-		const static decimal infinity = INFINITY;
-		const static decimal zero = 0e0;
-#else
-		typedef float	decimal;
-		const static decimal epsilon = 0.00001f;
-		const static decimal zero = 0.0f;
-		const static decimal infinity = INFINITY;
-#endif
-		typedef decimal				scalar;
+	public:
+		Math::Resolution get_resolution() const;
+		Math::Color get_pixel(int x, int y) const;
+		void set_pixel(int x, int y, const Math::Color& value);
+			
+	protected:
+		Math::Resolution				m_resolution;
+		std::unique_ptr<Math::Color>	m_p_pixels;
+	};
 
-		inline bool decimal_equal(decimal left, decimal right)
-		{
-			if (abs(left - right) < epsilon)
-				return true;
-			return false;
-		}
-	} //namespace Math
-} //namespace Light
+	inline Texture2D::Texture2D(const Math::Resolution& resolution) :
+		m_resolution(resolution),
+		m_p_pixels(new Math::Color[resolution.get_width() * resolution.get_height()])
+	{}
+
+	inline Texture2D::~Texture2D()
+	{}
+
+	inline Math::Resolution Texture2D::get_resolution() const
+	{
+		return m_resolution;
+	}
+
+	inline Math::Color Texture2D::get_pixel(int x, int y) const
+	{
+		assert(m_resolution.get_width() != 0 && m_resolution.get_height() != 0);
+		assert(x >= 0 && x <= m_resolution.get_width());
+		assert(y >= 0 && y <= m_resolution.get_height());
+
+		return m_p_pixels.get()[x + y * m_resolution.get_width()];
+	}
+
+	inline void Texture2D::set_pixel(int x, int y, const Math::Color& value)
+	{
+		assert(m_resolution.get_width() != 0 && m_resolution.get_height() != 0);
+		assert(x >= 0 && x <= m_resolution.get_width());
+		assert(y >= 0 && y <= m_resolution.get_height());
+
+		m_p_pixels.get()[x + y * m_resolution.get_width()] = value;
+	}
+}

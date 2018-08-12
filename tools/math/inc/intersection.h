@@ -49,7 +49,7 @@ namespace Light
 			Intersection(const Ray3& ray_in, const Point3& hit_point,
 				const Vector3& normal, const decimal& travel);
 
-			inline void refresh_distance()
+			inline void refresh_travel()
 			{
 				m_travel = sqrt((m_ray_in.m_origin.m_x - m_hit_point.m_x)*(m_ray_in.m_origin.m_x - m_hit_point.m_x) +
 					(m_ray_in.m_origin.m_y - m_hit_point.m_y) * (m_ray_in.m_origin.m_y - m_hit_point.m_y) +
@@ -62,7 +62,7 @@ namespace Light
 				m_normal = m_normal * matrix;
 				m_normal.normalize();
 				m_ray_in.transform(matrix);
-				refresh_distance();
+				refresh_travel();
 			}
 
 		public:

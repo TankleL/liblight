@@ -1,5 +1,5 @@
 /* ****************************************************************************
-my-prerequisites.h
+default-camera
 -------------------------------------------------------------------------------
 
 Copyright (c) 2017, Tain L.
@@ -29,33 +29,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "../../../inc/prerequisites.hpp"
-#include <cmath>
-#include <algorithm>
+#include "camera.hpp"
 
 namespace Light
 {
-	namespace Math
+	class LIGHT_API DefaultCamera : public Camera
 	{
+	public:
+		DefaultCamera(Math::decimal filmplane_width = 16.0f,
+			Math::decimal filmplane_height = 9.0f,
+			Math::decimal filmplane_depth = 5.0f);
+		virtual ~DefaultCamera();
 
-#if ACCURACY_DOUBLE
-		typedef	double	decimal;
-		const static decimal epsilon = 1e-8;
-		const static decimal infinity = INFINITY;
-		const static decimal zero = 0e0;
-#else
-		typedef float	decimal;
-		const static decimal epsilon = 0.00001f;
-		const static decimal zero = 0.0f;
-		const static decimal infinity = INFINITY;
-#endif
-		typedef decimal				scalar;
+	public:
+		/**
+		@interface: generate_ray
+		@param: x_offset means the logic x-position that the ray intersects with the film plane. range is [-0.5, 0.5]
+		@param: y_offset means the logic y-position that the ray intersects with the film plane. range is [-0.5, 0.5]
+		@return: a camera ray
+		*/
+		virtual void generate_ray(Math::Ray3& cray, Math::decimal x_offset, Math::decimal y_offset) override;
 
-		inline bool decimal_equal(decimal left, decimal right)
-		{
-			if (abs(left - right) < epsilon)
-				return true;
-			return false;
-		}
-	} //namespace Math
-} //namespace Light
+	public:
+		Math::decimal	m_lens_focus;
+		Math::decimal	m_lens_aperture;
+		Math::decimal	m_filmplane_width;
+		Math::decimal	m_filmplane_height;
+		Math::decimal	m_filmplane_depth;
+	};
+}

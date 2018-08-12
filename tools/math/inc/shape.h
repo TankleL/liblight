@@ -1,8 +1,8 @@
 /* ****************************************************************************
-my-prerequisites.h
+shape.h
 -------------------------------------------------------------------------------
 
-Copyright (c) 2017, Tain L.
+Copyright (c) 2018, Tain L.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -27,35 +27,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
-#pragma once
 
-#include "../../../inc/prerequisites.hpp"
-#include <cmath>
-#include <algorithm>
+#if !defined(LIGHT_MATHINC_SHAPE_H)
+#define LIGHT_MATHINC_SHAPE_H
+
+#include "my-prerequisites.h"
+#include "intersection.h"
 
 namespace Light
 {
 	namespace Math
 	{
-
-#if ACCURACY_DOUBLE
-		typedef	double	decimal;
-		const static decimal epsilon = 1e-8;
-		const static decimal infinity = INFINITY;
-		const static decimal zero = 0e0;
-#else
-		typedef float	decimal;
-		const static decimal epsilon = 0.00001f;
-		const static decimal zero = 0.0f;
-		const static decimal infinity = INFINITY;
-#endif
-		typedef decimal				scalar;
-
-		inline bool decimal_equal(decimal left, decimal right)
+		class Shape
 		{
-			if (abs(left - right) < epsilon)
-				return true;
-			return false;
-		}
-	} //namespace Math
-} //namespace Light
+		public:
+			virtual bool intersected(Intersection& inters, const Ray3& ray_in) = 0;
+		};
+	} // namespace Math
+} // namespace Light
+
+
+#endif // LIGHT_MATHINC_SHAPE_H

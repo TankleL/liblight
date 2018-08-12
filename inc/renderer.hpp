@@ -28,10 +28,14 @@ SOFTWARE.
 
 #pragma once
 
+#include "scene.hpp"
+#include "texture2d.hpp"
+
 namespace Light
 {
-	class Renderer
+	class LIGHT_API Renderer
 	{
-
+	public:
+		virtual void render(Texture2D& output, const Scene& scene) = 0;
 	};
 }

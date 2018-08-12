@@ -113,7 +113,7 @@ namespace Light
 		};
 
 	} // namespace Math
-} // namespace Spears
+} // namespace Light
 
 
 #endif // LIGHT_MATHINC_RAY3_H

@@ -1,5 +1,5 @@
 /* ****************************************************************************
-my-prerequisites.h
+default-camera
 -------------------------------------------------------------------------------
 
 Copyright (c) 2017, Tain L.
@@ -27,35 +27,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
-#pragma once
+#include "api-dev-mod.hpp"
+#include "../inc/camera-default.hpp"
 
-#include "../../../inc/prerequisites.hpp"
-#include <cmath>
-#include <algorithm>
+using namespace Light;
 
-namespace Light
+DefaultCamera::DefaultCamera(Math::decimal filmplane_width,
+	Math::decimal filmplane_height,
+	Math::decimal filmplane_depth) :
+	m_filmplane_width(filmplane_width),
+	m_filmplane_height(filmplane_height),
+	m_filmplane_depth(filmplane_depth)
+{}
+
+DefaultCamera::~DefaultCamera()
+{}
+
+/**
+@interface: generate_ray
+@param: x_offset means the logic x-position that the ray intersects with the film plane. range is [-0.5, 0.5]
+@param: y_offset means the logic y-position that the ray intersects with the film plane. range is [-0.5, 0.5]
+@return: a camera ray
+*/
+void DefaultCamera::generate_ray(Math::Ray3& cray, Math::decimal x_offset, Math::decimal y_offset)
 {
-	namespace Math
-	{
+	// calculate direction of the ray.
+	Math::Vector3 right_bias = m_right;
+	Math::Vector3 up_bias = m_up;
+	right_bias *= (x_offset * m_filmplane_width);
+	up_bias *= (y_offset * m_filmplane_height);
+	cray.m_direction = m_look;
+	cray.m_direction *= m_filmplane_depth;
+	cray.m_direction += right_bias;
+	cray.m_direction += up_bias;
+	cray.m_direction.normalize();
 
-#if ACCURACY_DOUBLE
-		typedef	double	decimal;
-		const static decimal epsilon = 1e-8;
-		const static decimal infinity = INFINITY;
-		const static decimal zero = 0e0;
-#else
-		typedef float	decimal;
-		const static decimal epsilon = 0.00001f;
-		const static decimal zero = 0.0f;
-		const static decimal infinity = INFINITY;
-#endif
-		typedef decimal				scalar;
-
-		inline bool decimal_equal(decimal left, decimal right)
-		{
-			if (abs(left - right) < epsilon)
-				return true;
-			return false;
-		}
-	} //namespace Math
-} //namespace Light
+	// set origin of ray.
+	cray.m_origin = m_position;
+}

@@ -42,5 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "triangleface.h"
 #include "material.h"
 #include "resolution.h"
+#include "shape.h"
+#include "shape-sphere.h"
+#include "random.h"
 
 #endif // LIGHT_MATHINC_H

@@ -1,8 +1,8 @@
 /* ****************************************************************************
-my-prerequisites.h
+shape-sphere.h
 -------------------------------------------------------------------------------
 
-Copyright (c) 2017, Tain L.
+Copyright (c) 2018, Tain L.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -27,35 +27,71 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
-#pragma once
 
-#include "../../../inc/prerequisites.hpp"
-#include <cmath>
-#include <algorithm>
+#if !defined(LIGHT_MATHINC_SHAPE_SPHERE_H)
+#define LIGHT_MATHINC_SHAPE_SPHERE_H
+
+#include "my-prerequisites.h"
+#include "shape.h"
 
 namespace Light
 {
 	namespace Math
 	{
-
-#if ACCURACY_DOUBLE
-		typedef	double	decimal;
-		const static decimal epsilon = 1e-8;
-		const static decimal infinity = INFINITY;
-		const static decimal zero = 0e0;
-#else
-		typedef float	decimal;
-		const static decimal epsilon = 0.00001f;
-		const static decimal zero = 0.0f;
-		const static decimal infinity = INFINITY;
-#endif
-		typedef decimal				scalar;
-
-		inline bool decimal_equal(decimal left, decimal right)
+		class ShapeSphere : public Shape
 		{
-			if (abs(left - right) < epsilon)
-				return true;
-			return false;
+		public:
+			ShapeSphere(const Point3& pos, decimal r);
+
+		public:
+			virtual bool intersected(Intersection& inters, const Ray3& ray_in) override;
+
+		protected:
+			Point3		m_p;
+			decimal		m_r;
+		};
+
+		inline ShapeSphere::ShapeSphere(const Point3& pos, decimal r)
+			: m_p(pos)
+			, m_r(r)
+		{}
+
+		inline bool ShapeSphere::intersected(Intersection& inters, const Ray3& ray_in)
+		{
+			bool res = false;
+
+			Vector3 op = m_p - ray_in.m_origin; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0 
+			decimal b = op.dot(ray_in.m_direction);
+			decimal det = b * b - op.dot(op) + m_r * m_r;
+			
+			if (det >= 0)
+			{
+				det = sqrt(det);
+				decimal t = b - det;
+
+				if (t > epsilon)
+				{
+					res = true;
+				}
+				else if ((t = b + det) > epsilon)
+				{
+					res = true;
+				}
+
+				if (res)
+				{
+					inters.m_hit_point = ray_in.on_ray(t);
+					inters.m_normal = (inters.m_hit_point - m_p);
+					inters.m_normal.normalize();
+					inters.m_ray_in = ray_in;
+					inters.m_travel = t;
+				}
+			}
+			
+			return res;
 		}
-	} //namespace Math
-} //namespace Light
+	} // namespace Math
+} // namespace Light
+
+
+#endif // LIGHT_MATHINC_SHAPE_SPHERE_H

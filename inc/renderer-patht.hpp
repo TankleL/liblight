@@ -30,8 +30,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 *******************************************************************************/
 
-#include "../inc/prerequisites.hpp"
-#include "../inc/renderer.hpp"
+#include "prerequisites.hpp"
+#include "scene.hpp"
+#include "renderer.hpp"
+#include "camera.hpp"
 
 namespace Light
 {
@@ -39,5 +41,14 @@ namespace Light
 	{
 	public:
 		RdrrPathTracing();
+
+	public:
+		virtual void render(Texture2D& output, const Scene& scene) override;
+
+	public:
+		void set_camera(std::shared_ptr<Camera> camera);
+
+	protected:
+		std::shared_ptr<Camera>	m_camera;
 	};
 }

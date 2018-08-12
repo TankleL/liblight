@@ -1,8 +1,8 @@
 /* ****************************************************************************
-my-prerequisites.h
+random.h
 -------------------------------------------------------------------------------
 
-Copyright (c) 2017, Tain L.
+Copyright (c) 2018, Tain L.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -27,35 +27,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
-#pragma once
 
-#include "../../../inc/prerequisites.hpp"
-#include <cmath>
-#include <algorithm>
+#if !defined(LIGHT_MATHINC_RANDOM_H)
+#define LIGHT_MATHINC_RANDOM_H
+
+#include "my-prerequisites.h"
 
 namespace Light
 {
 	namespace Math
 	{
-
-#if ACCURACY_DOUBLE
-		typedef	double	decimal;
-		const static decimal epsilon = 1e-8;
-		const static decimal infinity = INFINITY;
-		const static decimal zero = 0e0;
-#else
-		typedef float	decimal;
-		const static decimal epsilon = 0.00001f;
-		const static decimal zero = 0.0f;
-		const static decimal infinity = INFINITY;
-#endif
-		typedef decimal				scalar;
-
-		inline bool decimal_equal(decimal left, decimal right)
+		class DecimalRandom
 		{
-			if (abs(left - right) < epsilon)
-				return true;
-			return false;
-		}
-	} //namespace Math
-} //namespace Light
+		public:
+			static inline decimal dice(decimal max = 1.0f)
+			{
+				return (decimal)(rand() / (decimal)RAND_MAX) * max;
+			}
+		};
+	} // namespace Math
+} // namespace Light
+
+
+#endif // LIGHT_MATHINC_RANDOM_H

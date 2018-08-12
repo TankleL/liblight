@@ -31,9 +31,22 @@ SOFTWARE.
 *******************************************************************************/
 
 #include "api-dev-mod.hpp"
+#include "../tools/math/inc/mathinc.h"
 #include "../inc/renderer-patht.hpp"
 
 using namespace Light;
 
 RdrrPathTracing::RdrrPathTracing()
 {}
+
+void RdrrPathTracing::set_camera(std::shared_ptr<Camera> camera)
+{
+	m_camera = camera;
+}
+
+void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
+{
+	Math::Resolution reso = output.get_resolution();
+
+
+}

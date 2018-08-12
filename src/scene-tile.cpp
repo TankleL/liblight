@@ -27,26 +27,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 *******************************************************************************/
 
-#pragma once
+#include "api-dev-mod.hpp"
+#include "../inc/scene-tile.hpp"
 
-#include "scene.hpp"
-#include "../tools/math/inc/mathinc.h"
+using namespace Light;
 
-namespace Light
+TileScene::TileScene()
+{}
+
+TileScene::~TileScene()
+{}
+
+void TileScene::add_shape(const std::shared_ptr<Math::Shape>& shape)
 {
-	class LIGHT_API TileScene : public Scene
+	m_shapes.push_back(shape);
+}
+
+bool TileScene::hit_detect(HitInfo& info, const Math::Ray3& ray_in)
+{
+	bool retval = false;
+
+	Math::Intersection inters;
+	for (const auto& shape : m_shapes)
 	{
-	public:
-		TileScene();
-		virtual ~TileScene();
+		bool hit = shape->intersected(inters, ray_in);
+		if (hit && !retval)
+		{ // firtst hit
+			retval = hit;
+			info.inters = inters;
+		}
+		else if (hit)
+		{ // hit other shape
+			if (inters.m_travel < info.inters.m_travel)
+			{ // use the nearest one
+				info.inters = inters;
+			}
+		}
+	}
 
-	public:
-		virtual bool hit_detect(HitInfo& info, const Math::Ray3& ray_in) override;
-
-	public:
-		void add_shape(const std::shared_ptr<Math::Shape>& shape);
-
-	protected:
-		std::vector<std::shared_ptr<Math::Shape>>	m_shapes;
-	};
+	return retval;
 }
