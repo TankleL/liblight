@@ -30,6 +30,7 @@ SOFTWARE.
 
 #include "prerequisites.hpp"
 #include "../tools/math/inc/mathinc.h"
+#include "material.hpp"
 
 namespace Light
 {
@@ -38,14 +39,21 @@ namespace Light
 	public:
 		struct HitInfo
 		{
-			HitInfo(const Math::Intersection& intersection)
-				: inters(intersection)
+			HitInfo()
+				: mtrl(nullptr)
 			{}
 
-			Math::Intersection	inters;
+			HitInfo(const Math::Intersection& intersection,
+				const Material* material)
+				: inters(intersection)
+				, mtrl(material)
+			{}
+
+			Math::Intersection			inters;
+			const Material*				mtrl;
 		};
 
 	public:
-		virtual bool hit_detect(HitInfo& info, const Math::Ray3& ray_in) = 0;
+		virtual bool hit_detect(HitInfo& info, const Math::Ray3& ray_in) const = 0;
 	};
 }

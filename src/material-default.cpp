@@ -1,6 +1,5 @@
 /*******************************************************************************
-@module scene-tile
-@remarks tile scene means that it is a scene without tree structure
+@module  material-default
 
 ==----------------------------------------------------------------------------==
 
@@ -27,41 +26,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 *******************************************************************************/
 
-#pragma once
-
-#include "scene.hpp"
+#include "api-dev-mod.hpp"
+#include "../inc/material-default.hpp"
 #include "../tools/math/inc/mathinc.h"
 
-namespace Light
+using namespace Light;
+
+DefaultMaterial::DefaultMaterial()
+	: Material("default")
+	, m_properties(NONE)
+{}
+
+DefaultMaterial::~DefaultMaterial()
+{}
+
+void DefaultMaterial::set_color(MATERIAL_BIT bit, const Math::Color& clr)
 {
-	class LIGHT_API TileScene : public Scene
-	{
-	public:
-		TileScene();
-		virtual ~TileScene();
+	if (bit > 1)
+		m_color[Math::fast_log2(bit)] = clr;
+	else
+		m_color[0] = clr;
 
-	public:
-		virtual bool hit_detect(HitInfo& info, const Math::Ray3& ray_in) const override;
+	m_properties &= bit;
+}
 
-	public:
-		void add_material(const std::string& material_name, const std::shared_ptr<Material>& material);
-		void add_shape(const std::shared_ptr<Math::Shape>& shape, const std::string& material_name);
+const Math::Color& DefaultMaterial::get_color(MATERIAL_BIT bit) const
+{
+	if (bit > 1)
+		return m_color[Math::fast_log2(bit)];
+	else
+		return m_color[0];
+}
 
-	protected:
-		struct _ShapeStoreItem
-		{
-			_ShapeStoreItem(const std::shared_ptr<Math::Shape>& the_shape,
-				const std::string& the_material_name)
-				: shape(the_shape)
-				, material_name(the_material_name)
-			{}
-
-			std::shared_ptr<Math::Shape>		shape;
-			std::string							material_name;
-		};
-
-	protected:
-		std::vector<_ShapeStoreItem>								m_shapes;
-		std::unordered_map<std::string, std::shared_ptr<Material>>	m_materials;
-	};
+bool DefaultMaterial::has_property(MATERIAL_BIT bit) const
+{
+	return m_properties & bit > 0;
 }

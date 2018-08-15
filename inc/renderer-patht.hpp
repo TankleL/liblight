@@ -40,7 +40,7 @@ namespace Light
 	class LIGHT_API RdrrPathTracing : public Renderer
 	{
 	public:
-		RdrrPathTracing();
+		RdrrPathTracing(int max_radiance_depth = 8);
 
 	public:
 		virtual void render(Texture2D& output, const Scene& scene) override;
@@ -49,6 +49,10 @@ namespace Light
 		void set_camera(std::shared_ptr<Camera> camera);
 
 	protected:
+		bool radiance(Math::Color& output, const Scene& scene, const Math::Ray3& ray_in, int depth);
+
+	protected:
 		std::shared_ptr<Camera>	m_camera;
+		int	m_max_radiance_depth;
 	};
 }

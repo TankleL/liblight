@@ -1,8 +1,8 @@
 /* ****************************************************************************
-mathinc.h
+math-utils.h
 -------------------------------------------------------------------------------
 
-Copyright (c) 2017, Tain L.
+Copyright (c) 2018, Tain L.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -27,24 +27,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
-
-#if !defined(LIGHT_MATHINC_H)
-#define LIGHT_MATHINC_H
+#pragma once
 
 #include "my-prerequisites.h"
-#include "color.h"
-#include "vector3.h"
-#include "point3.h"
-#include "ray3.h"
-#include "matrix4.h"
-#include "aabbox.h"
-#include "intersection.h"
-#include "triangleface.h"
-#include "material.h"
-#include "resolution.h"
-#include "shape.h"
-#include "shape-sphere.h"
-#include "random.h"
-#include "math-utils.h"
 
-#endif // LIGHT_MATHINC_H
+namespace Light
+{
+	namespace Math
+	{
+		inline int fast_log2(int x)
+		{
+			float fx = (float)x;
+			uint32 ix = *(uint32*)&fx;
+			uint32 exp = (ix >> 23) & 0xFF;
+			return exp - 127;
+		}
+	}
+}

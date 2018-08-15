@@ -38,29 +38,36 @@ TileScene::TileScene()
 TileScene::~TileScene()
 {}
 
-void TileScene::add_shape(const std::shared_ptr<Math::Shape>& shape)
+void TileScene::add_material(const std::string& material_name, const std::shared_ptr<Material>& material)
 {
-	m_shapes.push_back(shape);
+	m_materials[material_name] = material;
 }
 
-bool TileScene::hit_detect(HitInfo& info, const Math::Ray3& ray_in)
+void TileScene::add_shape(const std::shared_ptr<Math::Shape>& shape, const std::string& material_name)
+{
+	m_shapes.push_back(_ShapeStoreItem(shape, material_name));
+}
+
+bool TileScene::hit_detect(HitInfo& info, const Math::Ray3& ray_in) const
 {
 	bool retval = false;
 
 	Math::Intersection inters;
-	for (const auto& shape : m_shapes)
+	for (const auto& item : m_shapes)
 	{
-		bool hit = shape->intersected(inters, ray_in);
+		bool hit = item.shape->intersected(inters, ray_in);
 		if (hit && !retval)
 		{ // firtst hit
 			retval = hit;
 			info.inters = inters;
+			info.mtrl = m_materials.at(item.material_name).get();
 		}
 		else if (hit)
 		{ // hit other shape
 			if (inters.m_travel < info.inters.m_travel)
 			{ // use the nearest one
 				info.inters = inters;
+				info.mtrl = m_materials.at(item.material_name).get();
 			}
 		}
 	}

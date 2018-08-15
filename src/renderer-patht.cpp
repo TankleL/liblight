@@ -33,10 +33,12 @@ SOFTWARE.
 #include "api-dev-mod.hpp"
 #include "../tools/math/inc/mathinc.h"
 #include "../inc/renderer-patht.hpp"
+#include "../inc/material-default.hpp"
 
 using namespace Light;
 
-RdrrPathTracing::RdrrPathTracing()
+RdrrPathTracing::RdrrPathTracing(int max_radiance_depth)
+	: m_max_radiance_depth(max_radiance_depth)
 {}
 
 void RdrrPathTracing::set_camera(std::shared_ptr<Camera> camera)
@@ -49,4 +51,53 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 	Math::Resolution reso = output.get_resolution();
 
 
+}
+
+bool RdrrPathTracing::radiance(Math::Color& output, const Scene& scene, const Math::Ray3& ray_in, int depth)
+{
+	bool retval = false;
+	bool quit = false;
+	
+	Scene::HitInfo hit_info;
+	quit = !scene.hit_detect(hit_info, ray_in);
+
+	if (!quit)
+	{	
+		if (depth > m_max_radiance_depth)
+		{ // Russian Roulette
+			// Stop the recursion randomly based on the surface reflectivity.
+			// TODO: impl R.R.
+			quit = true;
+		}
+		else
+		{
+			if ("default" == hit_info.mtrl->type())
+			{
+				const DefaultMaterial* mtrl = 
+					static_cast<const DefaultMaterial*>(hit_info.mtrl);
+
+				if (mtrl->has_property(DefaultMaterial::DIFFUSE))
+				{
+
+				}
+
+				if (mtrl->has_property(DefaultMaterial::REFLECT))
+				{
+
+				}
+
+				if (mtrl->has_property(DefaultMaterial::REFRACT))
+				{
+					
+				}
+
+				if (mtrl->has_property(DefaultMaterial::EMISSIVE))
+				{
+
+				}
+			}
+		}
+	}
+
+	return retval;
 }

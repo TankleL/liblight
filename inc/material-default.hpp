@@ -1,6 +1,5 @@
 /*******************************************************************************
-@module scene-tile
-@remarks tile scene means that it is a scene without tree structure
+@module material-default
 
 ==----------------------------------------------------------------------------==
 
@@ -29,39 +28,34 @@ SOFTWARE.
 
 #pragma once
 
-#include "scene.hpp"
+#include "material.hpp"
 #include "../tools/math/inc/mathinc.h"
 
 namespace Light
 {
-	class LIGHT_API TileScene : public Scene
+	class LIGHT_API DefaultMaterial : public Material
 	{
 	public:
-		TileScene();
-		virtual ~TileScene();
-
-	public:
-		virtual bool hit_detect(HitInfo& info, const Math::Ray3& ray_in) const override;
-
-	public:
-		void add_material(const std::string& material_name, const std::shared_ptr<Material>& material);
-		void add_shape(const std::shared_ptr<Math::Shape>& shape, const std::string& material_name);
-
-	protected:
-		struct _ShapeStoreItem
+		enum MATERIAL_BIT
 		{
-			_ShapeStoreItem(const std::shared_ptr<Math::Shape>& the_shape,
-				const std::string& the_material_name)
-				: shape(the_shape)
-				, material_name(the_material_name)
-			{}
-
-			std::shared_ptr<Math::Shape>		shape;
-			std::string							material_name;
+			NONE = 0,
+			DIFFUSE = 1,
+			REFLECT = 2,
+			REFRACT = 4,
+			EMISSIVE = 8
 		};
 
+	public:
+		DefaultMaterial();
+		virtual ~DefaultMaterial();
+
+	public:
+		void set_color(MATERIAL_BIT bit, const Math::Color& clr);
+		const Math::Color& get_color(MATERIAL_BIT bit) const;
+		bool has_property(MATERIAL_BIT bit) const;
+
 	protected:
-		std::vector<_ShapeStoreItem>								m_shapes;
-		std::unordered_map<std::string, std::shared_ptr<Material>>	m_materials;
+		int				m_properties;
+		Math::Color		m_color[5];
 	};
 }
