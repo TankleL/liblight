@@ -92,6 +92,7 @@ namespace Light
 		{
 			m_width = std::move(rhs.m_width);
 			m_height = std::move(rhs.m_height);
+			return *this;
 		}
 
 		inline bool Resolution::operator==(const Resolution& right)
