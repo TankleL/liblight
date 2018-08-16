@@ -40,7 +40,7 @@ namespace Light
 		{
 			NONE = 0,
 			DIFFUSE = 1,
-			REFLECT = 2,
+			SPECULAR = 2,
 			REFRACT = 4,
 			EMISSIVE = 8
 		};

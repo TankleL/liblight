@@ -49,7 +49,9 @@ namespace Light
 		void set_camera(std::shared_ptr<Camera> camera);
 
 	protected:
-		bool radiance(Math::Color& output, const Scene& scene, const Math::Ray3& ray_in, int depth);
+		bool _radiance(Math::Color& output, const Scene& scene, const Math::Ray3& ray_in, int depth);
+		Math::Ray3 _random_ray(const Math::Vector3& normal, const Math::Point3& hit_pos) const;
+		Math::Ray3 _reflect_ray(const Math::Ray3& ray_in, const Math::Vector3& normal) const;
 
 	protected:
 		std::shared_ptr<Camera>	m_camera;

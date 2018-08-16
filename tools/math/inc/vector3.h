@@ -59,7 +59,7 @@ namespace Light
 			decimal length() const;
 			decimal normalize();
 			decimal dot(const Vector3& rhs) const;
-			Vector3& cross(const Vector3& rhs);
+			Vector3 cross(const Vector3& rhs) const;
 
 		public:
 			union
@@ -184,14 +184,11 @@ namespace Light
 			return m_x * rhs.m_x + m_y * rhs.m_y + m_z * rhs.m_z;
 		}
 
-		inline Vector3& Vector3::cross(const Vector3& rhs)
+		inline Vector3 Vector3::cross(const Vector3& rhs) const
 		{
-			decimal x = m_y * rhs.m_z - m_z * rhs.m_y;
-			decimal y = m_z * rhs.m_x - m_x * rhs.m_z;
-			decimal z = m_x * rhs.m_y - m_y * rhs.m_x;
-
-			m_x = x; m_y = y; m_z = z;
-			return *this;
+			return Vector3(m_y * rhs.m_z - m_z * rhs.m_y,
+				m_z * rhs.m_x - m_x * rhs.m_z,
+				m_x * rhs.m_y - m_y * rhs.m_x);
 		}
 
 		inline Vector3 operator+(const Vector3& left, const Vector3& right)
