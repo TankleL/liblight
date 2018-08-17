@@ -60,5 +60,5 @@ const Math::Color& DefaultMaterial::get_color(MATERIAL_BIT bit) const
 
 bool DefaultMaterial::has_property(MATERIAL_BIT bit) const
 {
-	return m_properties & bit > 0;
+	return (m_properties & bit) > 0;
 }
