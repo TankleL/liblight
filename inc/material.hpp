@@ -1,6 +1,5 @@
 /*******************************************************************************
-@module scene-tile
-@remarks tile scene means that it is a scene without tree structure
+@module material
 
 ==----------------------------------------------------------------------------==
 
@@ -29,39 +28,25 @@ SOFTWARE.
 
 #pragma once
 
-#include "scene.hpp"
-#include "../tools/math/inc/mathinc.h"
+#include "prerequisites.hpp"
 
 namespace Light
 {
-	class LIGHT_API TileScene : public Scene
+	class LIGHT_API Material
 	{
 	public:
-		TileScene();
-		virtual ~TileScene();
+		Material(const std::string& type_name)
+			: m_type(type_name)
+		{}
+		virtual ~Material(){}
 
 	public:
-		virtual bool hit_detect(HitInfo& info, const Math::Ray3& ray_in) const override;
-
-	public:
-		void add_material(const std::string& material_name, const std::shared_ptr<Material>& material);
-		void add_shape(const std::shared_ptr<Math::Shape>& shape, const std::string& material_name);
-
-	protected:
-		struct _ShapeStoreItem
+		const std::string& type() const
 		{
-			_ShapeStoreItem(const std::shared_ptr<Math::Shape>& the_shape,
-				const std::string& the_material_name)
-				: shape(the_shape)
-				, material_name(the_material_name)
-			{}
-
-			std::shared_ptr<Math::Shape>		shape;
-			std::string							material_name;
-		};
+			return m_type;
+		}
 
 	protected:
-		std::vector<_ShapeStoreItem>								m_shapes;
-		std::unordered_map<std::string, std::shared_ptr<Material>>	m_materials;
+		const std::string	m_type;
 	};
 }
