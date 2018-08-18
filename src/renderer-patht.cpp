@@ -38,8 +38,12 @@ SOFTWARE.
 using namespace Light;
 using namespace Light::Math;
 
-RdrrPathTracing::RdrrPathTracing(int max_radiance_depth)
-	: m_max_radiance_depth(max_radiance_depth)
+RdrrPathTracing::RdrrPathTracing(int sample_scale,
+	int msaa_scale,
+	int max_radiance_depth)
+	: m_sample_scale(sample_scale)
+	, m_msaa_scale(msaa_scale)
+	, m_max_radiance_depth(max_radiance_depth)
 {}
 
 void RdrrPathTracing::set_camera(std::shared_ptr<Camera> camera)
@@ -49,9 +53,48 @@ void RdrrPathTracing::set_camera(std::shared_ptr<Camera> camera)
 
 void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 {
-	Math::Resolution reso = output.get_resolution();
+	const decimal rw = (decimal)output.get_resolution().get_width();
+	const decimal rh = (decimal)output.get_resolution().get_height();
+	const decimal h_rw = rw * 0.5;
+	const decimal h_rh = rh * 0.5;
 
-	
+	const int msaa_count = m_msaa_scale * m_msaa_scale;
+	Ray3 cray(Point3(0.f, 0.f, 0.f), Vector3(0.f, 0.f, 1.f));
+	Color pixel;
+	bool hit(false);
+	for (decimal y = 0; y < rh; y += 1.0)
+	{
+		for (decimal x = 0; x < rw; x += 1.0)
+		{
+			pixel = 0.0;
+			hit = false;
+			for (int msaa = 0; msaa < msaa_count; ++msaa)
+			{
+				Color msaa_pixel;
+				for (int s = 0; s < m_sample_scale; ++s)
+				{
+					const decimal px = (x - h_rw + DecimalRandom::dice() - 0.5) / rw;
+					const decimal py = (y - h_rh + DecimalRandom::dice() - 0.5) / rh;
+					
+					m_camera->generate_ray(cray, px, py);
+					Color clr_shade;
+					if (_radiance(clr_shade, scene, cray, 0))
+					{
+						hit = true;
+						clr_shade.clamp();
+						msaa_pixel += clr_shade / m_sample_scale;
+					}
+				}
+
+				pixel += msaa_pixel / msaa_count;
+			}
+
+			if (hit)
+			{
+				output.set_pixel((int)x, (int)y, pixel);
+			}
+		}
+	}
 }
 
 bool RdrrPathTracing::_radiance(Math::Color& output, const Scene& scene, const Math::Ray3& ray_in, int depth)
@@ -72,6 +115,7 @@ bool RdrrPathTracing::_radiance(Math::Color& output, const Scene& scene, const M
 		}
 		else
 		{
+			retval = true;
 			if ("default" == hit_info.mtrl->type())
 			{
 				const DefaultMaterial* mtrl = 

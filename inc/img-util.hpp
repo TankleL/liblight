@@ -1,5 +1,5 @@
 /*******************************************************************************
-@module  material-default
+@module image utilities
 
 ==----------------------------------------------------------------------------==
 
@@ -26,39 +26,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 *******************************************************************************/
 
-#include "api-dev-mod.hpp"
-#include "../inc/material-default.hpp"
-#include "../tools/math/inc/mathinc.h"
+#pragma once
 
-using namespace Light;
+#include "prerequisites.hpp"
+#include "exceptions/msg-exception.hpp"
+#include "texture2d.hpp"
 
-DefaultMaterial::DefaultMaterial()
-	: Material("default")
-	, m_properties(NONE)
-{}
-
-DefaultMaterial::~DefaultMaterial()
-{}
-
-void DefaultMaterial::set_color(MATERIAL_BIT bit, const Math::Color& clr)
+namespace Light
 {
-	if (bit > 1)
-		m_color[Math::fast_log2(bit)] = clr;
-	else
-		m_color[0] = clr;
+	namespace ImgUtil
+	{
+		inline void save_texture_as_ppm6(const std::string& file_path, const Texture2D& tex)
+		{
+			BEGIN_TRY();
+			std::ofstream bmp_file(file_path, std::ios::binary);
+			if (false == bmp_file.is_open())
+				throw msg_exception("cannot open the file for outputting bmp data");
 
-	m_properties |= bit;
-}
+			// form the header
+			std::ostringstream oss;
+			oss << "P6" << std::endl;
+			oss << tex.get_resolution().get_width() << " "
+				<< tex.get_resolution().get_height() << std::endl;
+			oss << "255" << std::endl;
 
-const Math::Color& DefaultMaterial::get_color(MATERIAL_BIT bit) const
-{
-	if (bit > 1)
-		return m_color[Math::fast_log2(bit)];
-	else
-		return m_color[0];
-}
+			bmp_file << oss.str();
 
-bool DefaultMaterial::has_property(MATERIAL_BIT bit) const
-{
-	return (m_properties & bit) > 0;
+			// output image data
+			const Math::Resolution res_tex = tex.get_resolution();
+			for (int y = 1; y <= res_tex.get_height(); ++y)
+			{
+				for (int x = 0; x < res_tex.get_width(); ++x)
+				{
+					Math::Color	clr = tex.get_pixel(x, res_tex.get_height() - y);
+					unsigned char r = static_cast<unsigned char>(clr.m_r * 255.0f);
+					unsigned char g = static_cast<unsigned char>(clr.m_g * 255.0f);
+					unsigned char b = static_cast<unsigned char>(clr.m_b * 255.0f);
+
+					bmp_file << r << g << b;
+				}
+			}
+			CTA();
+		}
+	}
 }

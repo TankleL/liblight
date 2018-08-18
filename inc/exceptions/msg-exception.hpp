@@ -1,5 +1,5 @@
 /*******************************************************************************
-@module  material-default
+@module message exception
 
 ==----------------------------------------------------------------------------==
 
@@ -26,39 +26,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 *******************************************************************************/
 
-#include "api-dev-mod.hpp"
-#include "../inc/material-default.hpp"
-#include "../tools/math/inc/mathinc.h"
+#pragma once
 
-using namespace Light;
+#include "../prerequisites.hpp"
 
-DefaultMaterial::DefaultMaterial()
-	: Material("default")
-	, m_properties(NONE)
-{}
-
-DefaultMaterial::~DefaultMaterial()
-{}
-
-void DefaultMaterial::set_color(MATERIAL_BIT bit, const Math::Color& clr)
+namespace Light
 {
-	if (bit > 1)
-		m_color[Math::fast_log2(bit)] = clr;
-	else
-		m_color[0] = clr;
+	class msg_exception : public std::exception
+	{
+	public:
+		msg_exception(const std::string& msg)
+			: m_msg(msg)
+		{}
 
-	m_properties |= bit;
-}
+		virtual char const* what() const override
+		{
+			return m_msg.c_str();
+		}
 
-const Math::Color& DefaultMaterial::get_color(MATERIAL_BIT bit) const
-{
-	if (bit > 1)
-		return m_color[Math::fast_log2(bit)];
-	else
-		return m_color[0];
-}
-
-bool DefaultMaterial::has_property(MATERIAL_BIT bit) const
-{
-	return (m_properties & bit) > 0;
+	protected:
+		std::string m_msg;
+	};
 }

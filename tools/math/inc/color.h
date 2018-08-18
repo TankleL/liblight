@@ -61,6 +61,14 @@ namespace Light
 				return *this;
 			}
 
+			Color& operator =(decimal value)
+			{
+				m_r = value;
+				m_g = value;
+				m_b = value;
+				return *this;
+			}
+
 			Color& operator +=(const Color& c)
 			{
 				m_r += c.m_r;
