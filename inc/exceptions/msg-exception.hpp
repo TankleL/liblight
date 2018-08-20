@@ -39,7 +39,7 @@ namespace Light
 			: m_msg(msg)
 		{}
 
-		virtual char const* what() const override
+		virtual char const* what() const _NOEXCEPT override
 		{
 			return m_msg.c_str();
 		}
