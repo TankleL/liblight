@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "resolution.h"
 #include "shape.h"
 #include "shape-sphere.h"
+#include "shape-triangle.h"
 #include "random.h"
 #include "math-utils.h"
 
