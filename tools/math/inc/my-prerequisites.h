@@ -38,7 +38,7 @@ namespace Light
 	namespace Math
 	{
 
-#if ACCURACY_DOUBLE
+#if defined(ACCURACY_DOUBLE)
 		typedef	double	decimal;
 		const static decimal epsilon = 1e-8;
 		const static decimal infinity = INFINITY;

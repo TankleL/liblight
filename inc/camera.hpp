@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace Light
 {
 	class LIGHT_API Camera
-	{
+			{
 	public:
 		Camera();
 		virtual ~Camera();

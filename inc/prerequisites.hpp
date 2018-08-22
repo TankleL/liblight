@@ -25,6 +25,8 @@
 #	define LIGHT_API
 #endif
 
+#define ACCURACY_DOUBLE
+
 
 #define BEGIN_TRY()					try{
 #define CTA()		}catch(...){throw;}
