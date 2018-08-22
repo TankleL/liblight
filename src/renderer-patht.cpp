@@ -39,10 +39,8 @@ using namespace Light;
 using namespace Light::Math;
 
 RdrrPathTracing::RdrrPathTracing(int sample_scale,
-	int msaa_scale,
 	int max_radiance_depth)
 	: m_sample_scale(sample_scale)
-	, m_msaa_scale(msaa_scale)
 	, m_max_radiance_depth(max_radiance_depth)
 {}
 
@@ -58,7 +56,6 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 	const decimal h_rw = rw * 0.5;
 	const decimal h_rh = rh * 0.5;
 
-	const int msaa_count = m_msaa_scale * m_msaa_scale;
 	Ray3 cray(Point3(0.f, 0.f, 0.f), Vector3(0.f, 0.f, 1.f));
 	Color pixel;
 	bool hit(false);
@@ -68,25 +65,20 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 		{
 			pixel = 0.0;
 			hit = false;
-			for (int msaa = 0; msaa < msaa_count; ++msaa)
-			{
-				Color msaa_pixel;
-				for (int s = 0; s < m_sample_scale; ++s)
-				{
-					const decimal px = (x - h_rw + DecimalRandom::dice() - 0.5) / rw;
-					const decimal py = (y - h_rh + DecimalRandom::dice() - 0.5) / rh;
-					
-					m_camera->generate_ray(cray, px, py);
-					Color clr_shade;
-					if (_radiance(clr_shade, scene, cray, 0))
-					{
-						hit = true;
-						clr_shade.clamp();
-						msaa_pixel += clr_shade / m_sample_scale;
-					}
-				}
 
-				pixel += msaa_pixel / msaa_count;
+			for (int s = 0; s < m_sample_scale; ++s)
+			{
+				const decimal px = (x - h_rw + DecimalRandom::dice() - 0.5) / rw;
+				const decimal py = (y - h_rh + DecimalRandom::dice() - 0.5) / rh;
+
+				m_camera->generate_ray(cray, px, py);
+				Color clr_shade;
+				if (_radiance(clr_shade, scene, cray, 0))
+				{
+					hit = true;
+					clr_shade.clamp();
+					pixel += clr_shade / m_sample_scale;
+				}
 			}
 
 			if (hit)
