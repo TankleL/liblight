@@ -4,6 +4,7 @@
 #include "../inc/camera-default.hpp"
 #include "../inc/material-default.hpp"
 #include "../inc/img-util.hpp"
+#include "../inc/tree.hpp"
 
 using namespace std;
 using namespace Light;
@@ -41,7 +42,15 @@ int main(int argc, char** argv)
 	shared_ptr<DefaultCamera> cam = make_shared<DefaultCamera>(10.0, 10.0);
 	rdr.set_camera(cam);
 
-	rdr.render(rt, scn);
+	// rdr.render(rt, scn);
+
+	XTree<int, std::string>	root(0, "root");
+	XTree<int, std::string>::node_t	n1(1, "a");
+	XTree<int, std::string>::node_t	n2(2, "2");
+
+	root.push(n1);
+	root.push(n2);
+	
 
 	ImgUtil::save_texture_as_ppm6("output.ppm", rt);
 
