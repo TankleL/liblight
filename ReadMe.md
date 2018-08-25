@@ -1,7 +1,7 @@
 # liblight
 a simple library to light up 3D scenes
 
-![first-sample-img](./sample-imgs/001-2018-august-18-23_40.PNG)
+![first-sample-img](./sample-imgs/001-2018-august-25-23_30.PNG)
 
 ## 1. How to build
 Please use cmake to build liblight out-of-source.
@@ -22,6 +22,8 @@ Enjoy it :)
 	#include "../inc/camera-default.hpp"
 	#include "../inc/material-default.hpp"
 	#include "../inc/img-util.hpp"
+	#include "../inc/tree.hpp"
+	#include "../inc/readers/reader-simple.hpp"
 	
 	using namespace std;
 	using namespace Light;
@@ -30,28 +32,17 @@ Enjoy it :)
 	int main(int argc, char** argv)
 	{
 		TileScene scn;
-		RdrrPathTracing rdr(16);
-		Texture2D rt(Math::Resolution(800, 800));
-	
-		shared_ptr<DefaultMaterial> mtrl_ball = make_shared<DefaultMaterial>();
-		mtrl_ball->set_color(DefaultMaterial::DIFFUSE, Color(1, 1, 1));
-		mtrl_ball->set_color(DefaultMaterial::SPECULAR, Color(1, 1, 1));
-	
-		shared_ptr<DefaultMaterial> mtrl_light = make_shared<DefaultMaterial>();
-		mtrl_light->set_color(DefaultMaterial::EMISSIVE, Color(1, 1, 1));
-	
-		scn.add_material("mtrl_ball", mtrl_ball);
-		scn.add_material("mtrl_light", mtrl_light);
-	
-		scn.add_shape(std::make_shared<Math::ShapeSphere>(Math::Point3(0, 0, 5), 1), "mtrl_ball");
-		scn.add_shape(std::make_shared<Math::ShapeSphere>(Math::Point3(0, 15, 0), 10), "mtrl_light");
-	
+		RdrrPathTracing rdr(512);
+		Texture2D rt(Math::Resolution(600, 600));
 		shared_ptr<DefaultCamera> cam = make_shared<DefaultCamera>(10.0, 10.0);
 		rdr.set_camera(cam);
 	
-		rdr.render(rt, scn);
-	
-		ImgUtil::save_texture_as_ppm6("output.ppm", rt);
+		if (SimpleReader::parse_json(scn, "../../test/data/test-simple-rdr.json"))
+		{
+			rdr.render(rt, scn);
+			
+			ImgUtil::save_texture_as_ppm6("output.ppm", rt);
+		}
 	
 		return 0;
 	}
