@@ -27,28 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
+#include "api-dev-mod.hpp"
+#include "../inc/resmg.hpp"
 
-#include "prerequisites.hpp"
-#include "tree.hpp"
+using namespace Light;
 
-#pragma once
-
-namespace Light
-{
-	class LIGHT_API ResourceTree
-	{
-	public:
-		
-
-	protected:
-		typedef struct _res_tree_node_value
-		{
-			char		_res_type;
-			std::string	_name;
-		} _NodeVal;
-
-	protected:
-		XTree<uint32, _NodeVal>	m_root;
-		uint32					m_index_top;
-	};
-}

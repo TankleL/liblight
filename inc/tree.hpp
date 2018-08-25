@@ -36,9 +36,15 @@ namespace Light
 	{
 	public:
 		typedef XTree<_KeyType, _ValueType>	node_t;
+	
 	public:
-		XTree() {}
-		virtual ~XTree() {}
+		XTree()
+		{}
+
+		XTree(const _KeyType& key)
+			: m_key(key)
+		{}
+
 		XTree(const _KeyType& key, const _ValueType& value)
 			: m_key(key)
 			, m_value(value)
@@ -78,22 +84,23 @@ namespace Light
 		}
 
 	public:
+		node_t& get_child_ref(const _KeyType& key)
+		{
+			return m_children.at(key);
+		}
+
 		void push(const XTree<_KeyType, _ValueType>& tree)
 		{
-			m_children.push_back(tree);
+			m_children[tree.get_key()] = tree;
 		}
 
-		void remove(size_t index)
+		void remove(const _KeyType& key)
 		{
-			assert(index < m_children.size());
-			std::vector<node_t>::iterator iter =
-				m_children.begin() + index;
-			m_children.erase(iter);
-		}
-
-		void set_key(const _KeyType& key)
-		{
-			m_key = key;
+			auto iter = m_children.find(key);
+			if (iter != m_children.end())
+			{
+				m_children.erase(iter);
+			}
 		}
 
 		_KeyType get_key() const
@@ -112,7 +119,7 @@ namespace Light
 		}
 
 	protected:
-		std::vector<node_t>	m_children;
+		std::unordered_map<_KeyType, node_t>	m_children;
 		_KeyType			m_key;
 		_ValueType			m_value;
 	};
