@@ -88,6 +88,13 @@ namespace Light
 						new_mtrl->set_color(DefaultMaterial::EMISSIVE, clr);
 					}
 
+					if (mtrl.HasMember("specular") && mtrl["specular"].IsArray())
+					{
+						rapidjson::Value jsClr = mtrl["specular"].GetArray();
+						Math::Color clr(jsClr[0].GetDouble(), jsClr[1].GetDouble(), jsClr[2].GetDouble());
+						new_mtrl->set_color(DefaultMaterial::SPECULAR, clr);
+					}
+
 					if (mtrl.HasMember("name") && mtrl["name"].IsString())
 					{
 						out.add_material(mtrl["name"].GetString(), new_mtrl);
@@ -124,6 +131,18 @@ namespace Light
 						std::string ref_mtrl = shape["mtrl"].GetString();
 
 						out.add_shape(std::make_shared<Math::ShapeTriangle>(v0, v1, v2), ref_mtrl);
+					}
+					else if (strcmp(shape["type"].GetString(), "rectangle") == 0)
+					{
+						rapidjson::Value jsPos = shape["pos"].GetArray();
+						Math::Point3 v0(jsPos[0].GetDouble(), jsPos[1].GetDouble(), jsPos[2].GetDouble());
+						Math::Point3 v1(jsPos[3].GetDouble(), jsPos[4].GetDouble(), jsPos[5].GetDouble());
+						Math::Point3 v2(jsPos[6].GetDouble(), jsPos[7].GetDouble(), jsPos[8].GetDouble());
+						Math::Point3 v3(jsPos[9].GetDouble(), jsPos[10].GetDouble(), jsPos[11].GetDouble());
+
+						std::string ref_mtrl = shape["mtrl"].GetString();
+
+						out.add_shape(std::make_shared<Math::ShapeRectangle>(v0, v1, v2, v3), ref_mtrl);
 					}
 				}
 			}

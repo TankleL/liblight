@@ -55,6 +55,7 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 	const decimal rh = (decimal)output.get_resolution().get_height();
 	const decimal h_rw = rw * 0.5;
 	const decimal h_rh = rh * 0.5;
+	const int msaa_scale = 4;
 
 	Ray3 cray(Point3(0.f, 0.f, 0.f), Vector3(0.f, 0.f, 1.f));
 	for (decimal y = 0; y < rh; y += 1.0)
@@ -64,17 +65,28 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 			Color pixel;
 			int hit_count = 0;
 
-			for (int s = 0; s < m_sample_scale; ++s)
+			const decimal px = (x - h_rw) / rw;
+			const decimal py = (y - h_rh) / rh;
+
+			m_camera->generate_ray(cray, px, py);
+			Color c_shade;
+			if (_radiance(c_shade, scene, cray, 0))
+			{
+				++hit_count;
+				pixel += c_shade / (decimal)(1 + msaa_scale);
+			}
+
+			for (int s = 0; s < msaa_scale; ++s)
 			{
 				const decimal px = (x - h_rw + DecimalRandom::dice() - 0.5) / rw;
 				const decimal py = (y - h_rh + DecimalRandom::dice() - 0.5) / rh;
 
 				m_camera->generate_ray(cray, px, py);
-				Color clr_shade;
-				if (_radiance(clr_shade, scene, cray, 0))
+				Color s_shade;
+				if (_radiance(s_shade, scene, cray, 0))
 				{
 					++hit_count;
-					pixel += clr_shade / m_sample_scale;
+					pixel += s_shade / (decimal)msaa_scale;
 				}
 			}
 
@@ -101,10 +113,12 @@ bool RdrrPathTracing::_radiance(Math::Color& output, const Scene& scene, const M
 		{ // Russian Roulette
 			// Stop the recursion randomly based on the surface reflectivity.
 			// TODO: impl R.R.
-			quit = true;
+			return false;
 		}
 		else
 		{
+			++depth;
+
 			retval = true;
 			if ("default" == hit_info.mtrl->type())
 			{
@@ -116,17 +130,25 @@ bool RdrrPathTracing::_radiance(Math::Color& output, const Scene& scene, const M
 
 				if (mtrl->has_property(DefaultMaterial::DIFFUSE))
 				{
-					Color trace;
-					if (_radiance(trace, scene, _random_ray(nl, hit_info.inters.m_hit_point), depth + 1))
+					Color diff;
+
+					for (int i = 0; i < m_sample_scale / (depth*depth); ++i)
 					{
-						output += mtrl->get_color(DefaultMaterial::DIFFUSE) * trace;
+						Color trace;
+						if (_radiance(trace, scene, _random_ray(nl, hit_info.inters.m_hit_point), depth))
+						{
+							diff += mtrl->get_color(DefaultMaterial::DIFFUSE) * trace / ((decimal)m_sample_scale / (depth*depth));
+						}
 					}
+					output += diff;
 				}
 
 				if (mtrl->has_property(DefaultMaterial::SPECULAR))
 				{
 					Color trace;
-					if (_radiance(trace, scene, hit_info.inters.m_ray_in, depth + 1))
+					Ray3 ray_rfl = _reflect_ray(ray_in, hit_info.inters.m_hit_point, hit_info.inters.m_normal);
+
+					if (_radiance(trace, scene, ray_rfl, depth))
 					{
 						output += mtrl->get_color(DefaultMaterial::SPECULAR) * trace;
 					}
@@ -163,7 +185,7 @@ Math::Ray3 RdrrPathTracing::_random_ray(const Math::Vector3& normal, const Math:
 	return Ray3(hit_pos, dir);
 }
 
-Math::Ray3 RdrrPathTracing::_reflect_ray(const Math::Ray3& ray_in, const Math::Vector3& normal) const
+Math::Ray3 RdrrPathTracing::_reflect_ray(const Math::Ray3& ray_in, const Math::Point3& hit_point, const Math::Vector3& normal) const
 {
-	return Ray3(ray_in.m_origin, ray_in.m_direction - normal * 2 * normal.dot(ray_in.m_direction));
+	return Ray3(hit_point, ray_in.m_direction - normal * 2 * normal.dot(ray_in.m_direction));
 }

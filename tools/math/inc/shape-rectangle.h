@@ -1,8 +1,8 @@
 /* ****************************************************************************
-mathinc.h
+shape-rectangle.h
 -------------------------------------------------------------------------------
 
-Copyright (c) 2017, Tain L.
+Copyright (c) 2018, Tain L.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,25 +28,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **************************************************************************** */
 
 
-#if !defined(LIGHT_MATHINC_H)
-#define LIGHT_MATHINC_H
+#if !defined(LIGHT_MATHINC_SHAPE_RECTANGLE_H)
+#define LIGHT_MATHINC_SHAPE_RECTANGLE_H
 
 #include "my-prerequisites.h"
-#include "color.h"
-#include "vector3.h"
-#include "point3.h"
-#include "ray3.h"
-#include "matrix4.h"
-#include "aabbox.h"
-#include "intersection.h"
-#include "triangleface.h"
-#include "material.h"
-#include "resolution.h"
-#include "shape.h"
-#include "shape-sphere.h"
 #include "shape-triangle.h"
-#include "shape-rectangle.h"
-#include "random.h"
-#include "math-utils.h"
 
-#endif // LIGHT_MATHINC_H
+namespace Light
+{
+	namespace Math
+	{
+		class ShapeRectangle : public Shape
+		{
+		public:
+			ShapeRectangle(const Point3& vt0, const Point3& vt1,
+				const Point3& vt2, const Point3& vt3);
+			virtual ~ShapeRectangle();
+
+		public:
+			virtual bool intersected(Intersection& inters, const Ray3& ray_in) override;
+
+		protected:
+			ShapeTriangle*	m_tris[2];
+		};
+
+		inline ShapeRectangle::ShapeRectangle(const Point3& vt0, const Point3& vt1,
+			const Point3& vt2, const Point3& vt3)
+		{
+			m_tris[0] = new ShapeTriangle(vt0, vt1, vt2);
+			m_tris[1] = new ShapeTriangle(vt2, vt3, vt0);
+		}
+
+		inline ShapeRectangle::~ShapeRectangle()
+		{
+			delete m_tris[0];
+			delete m_tris[1];
+		}
+
+		inline bool ShapeRectangle::intersected(Intersection& inters, const Ray3& ray_in)
+		{
+			bool res = false;
+
+			if (m_tris[0]->intersected(inters, ray_in))
+				res = true;
+			else if (m_tris[1]->intersected(inters, ray_in))
+				res = true;
+
+			return res;
+		}
+
+	} // namespace Math
+} // namespace Light
+
+
+#endif // LIGHT_MATHINC_SHAPE_RECTANGLE_H

@@ -1,0 +1,90 @@
+{
+	  "mtrl_list" :
+	[
+		{
+			  "type" : "default"
+			, "name" : "white_obj"
+			, "diffuse" : [0.8, 0.8, 0.8]
+		}
+		,{
+			  "type" : "default"
+			, "name" : "blue_obj"
+			, "diffuse" : [0.2, 0.3, 1]
+		}
+		,{
+			  "type" : "default"
+			, "name" : "green_obj"
+			, "diffuse" : [0.2, 1, 0.4]
+		}
+		,{
+			  "type" : "default"
+			, "name" : "white_light"
+			, "emissive" : [6, 6, 6]
+		}
+	]
+	, "shape_list" :
+	[
+		{
+			  "type" : "rectangle"
+			, "mtrl" : "white_light"
+			, "pos" : [
+				-1, 1.5, 2.5,
+				 1, 1.5, 2.5,
+				 1, 1.5, 3.5,
+				-1, 1.5 , 3.5
+				 ]
+			, "_comment" : "box-top"
+		}
+		,{
+			  "type" : "rectangle"
+			, "mtrl" : "white_obj"
+			, "pos" : [
+				-2, 1.7, 2,
+				 2, 1.7, 2,
+				 2, 1.7, 4,
+				-2, 1.7, 4
+				 ]
+			, "_comment" : "box-top"
+		}
+		,{
+			  "type" : "rectangle"
+			, "mtrl" : "white_obj"
+			, "pos" : [
+				-2, -1.8, 2,
+				-2, -1.8, 4,
+				 2, -1.8, 4,
+				 2, -1.8, 2]
+			, "_comment" : "box-bottom"
+		}
+		,{
+			  "type" : "rectangle"
+			, "mtrl" : "white_obj"
+			, "pos" : [
+				2, -1.8, 2,
+				2, -1.8, 4,
+				2,  1.7, 4,
+				2,  1.7, 2]
+			, "_comment" : "box-right"
+		}
+		,{
+			  "type" : "rectangle"
+			, "mtrl" : "white_obj"
+			, "pos" : [
+				-2, -1.8, 2,
+				-2, -1.8, 4,
+				-2,  1.7, 4,
+				-2,  1.7, 2]
+			, "_comment" : "box-left"
+		}
+		,{
+			  "type" : "rectangle"
+			, "mtrl" : "white_obj"
+			, "pos" : [
+				-2, -1.8, 4,
+				-2,  1.7, 4,
+				 2,  1.7, 4,
+				 2, -1.8, 4]
+			, "_comment" : "box-back"
+		}
+	]
+}
