@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 {
 	TileScene scn;
 	RdrrPathTracing rdr(512);
-	Texture2D rt(Math::Resolution(600, 600));
+	Texture2D rt(Math::Resolution(800, 800));
 	shared_ptr<DefaultCamera> cam = make_shared<DefaultCamera>(10.0, 10.0);
 	rdr.set_camera(cam);
 

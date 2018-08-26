@@ -57,14 +57,12 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 	const decimal h_rh = rh * 0.5;
 
 	Ray3 cray(Point3(0.f, 0.f, 0.f), Vector3(0.f, 0.f, 1.f));
-	Color pixel;
-	bool hit(false);
 	for (decimal y = 0; y < rh; y += 1.0)
 	{
 		for (decimal x = 0; x < rw; x += 1.0)
 		{
-			pixel = 0.0;
-			hit = false;
+			Color pixel;
+			int hit_count = 0;
 
 			for (int s = 0; s < m_sample_scale; ++s)
 			{
@@ -75,14 +73,14 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 				Color clr_shade;
 				if (_radiance(clr_shade, scene, cray, 0))
 				{
-					hit = true;
-					clr_shade.clamp();
+					++hit_count;
 					pixel += clr_shade / m_sample_scale;
 				}
 			}
 
-			if (hit)
+			if (hit_count)
 			{
+				pixel.clamp();
 				output.set_pixel((int)x, (int)y, pixel);
 			}
 		}
