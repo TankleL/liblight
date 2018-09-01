@@ -65,10 +65,6 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 			Color pixel;
 			int hit_count = 0;
 
-			const decimal px = (x - h_rw) / rw;
-			const decimal py = (y - h_rh) / rh;
-
-			m_camera->generate_ray(cray, px, py);
 			Color c_shade;
 			for (int s = 0; s < m_sample_scale; ++s)
 			{

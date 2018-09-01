@@ -21,6 +21,11 @@
 			, "name" : "white_light"
 			, "emissive" : [5, 5, 5]
 		}
+		,{
+			  "type" : "default"
+			, "name" : "purple_ball"
+			, "specular" : [1, 1, 1]
+		}
 	]
 	, "shape_list" :
 	[
@@ -81,6 +86,12 @@
 				 2,  1.7, 4,
 				 2, -1.8, 4]
 			, "_comment" : "box-back"
+		}
+		,{
+			  "type" : "sphere"
+			, "mtrl" : "purple_ball"
+			, "radius" : 1
+			, "pos" : [-0.6, -1, 3]
 		}
 	]
 }
