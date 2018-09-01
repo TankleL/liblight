@@ -19,28 +19,24 @@
 		,{
 			  "type" : "default"
 			, "name" : "white_light"
-			, "emissive" : [6, 6, 6]
+			, "emissive" : [5, 5, 5]
 		}
 	]
 	, "shape_list" :
 	[
 		{
-			  "type" : "rectangle"
+			  "type" : "sphere"
 			, "mtrl" : "white_light"
-			, "pos" : [
-				-1, 1.5, 2.5,
-				 1, 1.5, 2.5,
-				 1, 1.5, 3.5,
-				-1, 1.5 , 3.5
-				 ]
-			, "_comment" : "box-top"
+			, "radius" : 5
+			, "pos" : [0, 6.6, 2.88]
+			, "_comment" : "light"
 		}
 		,{
 			  "type" : "rectangle"
 			, "mtrl" : "white_obj"
 			, "pos" : [
-				-2, 1.7, 2,
-				 2, 1.7, 2,
+				-2, 1.7, 0,
+				 2, 1.7, 0,
 				 2, 1.7, 4,
 				-2, 1.7, 4
 				 ]
@@ -58,7 +54,7 @@
 		}
 		,{
 			  "type" : "rectangle"
-			, "mtrl" : "white_obj"
+			, "mtrl" : "green_obj"
 			, "pos" : [
 				2, -1.8, 2,
 				2, -1.8, 4,
@@ -68,7 +64,7 @@
 		}
 		,{
 			  "type" : "rectangle"
-			, "mtrl" : "white_obj"
+			, "mtrl" : "blue_obj"
 			, "pos" : [
 				-2, -1.8, 2,
 				-2, -1.8, 4,

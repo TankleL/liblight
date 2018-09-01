@@ -55,11 +55,11 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 	const decimal rh = (decimal)output.get_resolution().get_height();
 	const decimal h_rw = rw * 0.5;
 	const decimal h_rh = rh * 0.5;
-	const int msaa_scale = 4;
 
 	Ray3 cray(Point3(0.f, 0.f, 0.f), Vector3(0.f, 0.f, 1.f));
 	for (decimal y = 0; y < rh; y += 1.0)
 	{
+		printf("\rrendering, current row = %d, progress = %3.2f%%", (int)y, y / rh * 100.0);
 		for (decimal x = 0; x < rw; x += 1.0)
 		{
 			Color pixel;
@@ -70,13 +70,7 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 
 			m_camera->generate_ray(cray, px, py);
 			Color c_shade;
-			if (_radiance(c_shade, scene, cray, 0))
-			{
-				++hit_count;
-				pixel += c_shade / (decimal)(1 + msaa_scale);
-			}
-
-			for (int s = 0; s < msaa_scale; ++s)
+			for (int s = 0; s < m_sample_scale; ++s)
 			{
 				const decimal px = (x - h_rw + DecimalRandom::dice() - 0.5) / rw;
 				const decimal py = (y - h_rh + DecimalRandom::dice() - 0.5) / rh;
@@ -86,7 +80,7 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 				if (_radiance(s_shade, scene, cray, 0))
 				{
 					++hit_count;
-					pixel += s_shade / (decimal)msaa_scale;
+					pixel += s_shade / (decimal)m_sample_scale;
 				}
 			}
 
@@ -132,15 +126,10 @@ bool RdrrPathTracing::_radiance(Math::Color& output, const Scene& scene, const M
 				{
 					Color diff;
 
-					for (int i = 0; i < m_sample_scale / (depth*depth); ++i)
+					if (_radiance(diff, scene, _random_ray(nl, hit_info.inters.m_hit_point), depth))
 					{
-						Color trace;
-						if (_radiance(trace, scene, _random_ray(nl, hit_info.inters.m_hit_point), depth))
-						{
-							diff += mtrl->get_color(DefaultMaterial::DIFFUSE) * trace / ((decimal)m_sample_scale / (depth*depth));
-						}
+						output += mtrl->get_color(DefaultMaterial::DIFFUSE) * diff;
 					}
-					output += diff;
 				}
 
 				if (mtrl->has_property(DefaultMaterial::SPECULAR))
