@@ -60,6 +60,7 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 	for (decimal y = 0; y < rh; y += 1.0)
 	{
 		printf("\rrendering, current row = %d, progress = %3.2f%%", (int)y, y / rh * 100.0);
+		fflush(stdout);
 		for (decimal x = 0; x < rw; x += 1.0)
 		{
 			Color pixel;
@@ -87,6 +88,7 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 			}
 		}
 	}
+	printf("\n");
 }
 
 bool RdrrPathTracing::_radiance(Math::Color& output, const Scene& scene, const Math::Ray3& ray_in, int depth)
