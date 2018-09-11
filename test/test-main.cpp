@@ -14,8 +14,8 @@ using namespace Light::Math;
 int main(int argc, char** argv)
 {
 	TileScene scn;
-	RdrrPathTracing rdr(400, 10);
-	Texture2D rt(Math::Resolution(800, 800));
+	RdrrPathTracing rdr(32, 10);
+	Texture2D rt(Math::Resolution(180, 180));
 	shared_ptr<DefaultCamera> cam = make_shared<DefaultCamera>(10.0, 10.0);
 	rdr.set_camera(cam);
 

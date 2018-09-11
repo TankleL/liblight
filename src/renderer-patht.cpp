@@ -115,14 +115,17 @@ bool RdrrPathTracing::_radiance(Math::Color& output, const Scene& scene, const M
 				const DefaultMaterial* mtrl = 
 					static_cast<const DefaultMaterial*>(hit_info.mtrl);
 
-				Vector3 nl = hit_info.inters.m_normal.dot(hit_info.inters.m_ray_in.m_direction) < 0 ?
-					hit_info.inters.m_normal : hit_info.inters.m_normal * -1;
+				const Point3& x = hit_info.inters.m_hit_point;
+				const Vector3& n = hit_info.inters.m_normal;
+				const Ray3& r = ray_in;
+
+				Vector3 nl = n.dot(r.m_direction) < 0 ?	n : n * -1;
 
 				if (mtrl->has_property(DefaultMaterial::DIFFUSE))
 				{
 					Color diff;
 
-					if (_radiance(diff, scene, _random_ray(nl, hit_info.inters.m_hit_point), depth))
+					if (_radiance(diff, scene, _random_ray(nl, x), depth))
 					{
 						output += mtrl->get_color(DefaultMaterial::DIFFUSE) * diff;
 					}
@@ -130,18 +133,72 @@ bool RdrrPathTracing::_radiance(Math::Color& output, const Scene& scene, const M
 
 				if (mtrl->has_property(DefaultMaterial::SPECULAR))
 				{
-					Color trace;
-					Ray3 ray_rfl = _reflect_ray(ray_in, hit_info.inters.m_hit_point, hit_info.inters.m_normal);
+					Color spec;
+					Ray3 ray_rfl = _reflect_ray(ray_in, x, n);
 
-					if (_radiance(trace, scene, ray_rfl, depth))
+					if (_radiance(spec, scene, ray_rfl, depth))
 					{
-						output += mtrl->get_color(DefaultMaterial::SPECULAR) * trace;
+						output += mtrl->get_color(DefaultMaterial::SPECULAR) * spec;
 					}
 				}
 
 				if (mtrl->has_property(DefaultMaterial::REFRACT))
 				{
-					// TODO: calculate refract.
+					Ray3 ref_ray(x, r.m_direction - n*2*n.dot(r.m_direction));
+					bool is_going_in = n.dot(nl) > 0.0;
+					decimal nc = 1.0;
+					decimal nt = 1.5;
+					decimal nnt = is_going_in ? nc / nt : nt / nc, ddn = r.m_direction.dot(nl);
+					decimal cos2t = 1 - nnt * nnt*(1 - ddn * ddn);
+
+					if (cos2t < 0) // // Total internal reflection
+					{
+						Color refr;
+						if (_radiance(refr, scene, ref_ray, depth))
+						{
+							output += mtrl->get_color(DefaultMaterial::REFRACT) * refr;
+						}
+					}
+					else
+					{
+						Vector3 tdir = (r.m_direction*nnt - n * ((is_going_in ? 1 : -1)*(ddn*nnt + sqrt(cos2t))));
+						tdir.normalize();
+
+						double a = nt - nc, b = nt + nc, R0 = a * a / (b*b), c = 1 - (is_going_in ? -ddn : tdir.dot(n));
+						double Re = R0 + (1 - R0)*c*c*c*c*c, Tr = 1 - Re, P = .25 + .5*Re, RP = Re / P, TP = Tr / (1 - P);
+
+						Color refr;
+						if (depth > 2)
+						{
+							// Russian roulette 
+							if (DecimalRandom::dice() < P)
+							{
+								if (_radiance(refr, scene, ref_ray, depth))
+								{
+									output += mtrl->get_color(DefaultMaterial::REFRACT) * refr * RP;
+								}
+							}
+							else
+							{
+								if (_radiance(refr, scene, Ray3(x, tdir), depth))
+								{
+									output += mtrl->get_color(DefaultMaterial::REFRACT) * refr * TP;
+								}
+							}
+						}
+						else
+						{
+							if (_radiance(refr, scene, ref_ray, depth))
+							{
+								output += mtrl->get_color(DefaultMaterial::REFRACT) * refr * Re;
+							}
+
+							if (_radiance(refr, scene, Ray3(x, tdir), depth))
+							{
+								output += mtrl->get_color(DefaultMaterial::REFRACT) * refr * TP;
+							}
+						}
+					}
 				}
 
 				if (mtrl->has_property(DefaultMaterial::EMISSIVE))
