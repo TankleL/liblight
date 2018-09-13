@@ -50,7 +50,7 @@ namespace Light
 		void set_camera(std::shared_ptr<Camera> camera);
 
 	protected:
-		bool _radiance(Math::Color& output, const Scene& scene, const Math::Ray3& ray_in, int depth);
+		Math::Color _radiance(const Scene& scene, const Math::Ray3& ray_in, int depth);
 		Math::Ray3 _random_ray(const Math::Vector3& normal, const Math::Point3& hit_pos) const;
 		Math::Ray3 _reflect_ray(const Math::Ray3& ray_in, const Math::Point3& hit_point, const Math::Vector3& normal) const;
 
@@ -58,5 +58,9 @@ namespace Light
 		std::shared_ptr<Camera>	m_camera;
 		int	m_max_radiance_depth;
 		int m_sample_scale;
+
+	protected:
+		Math::Color m_back_clr;
+		Math::Color	m_cur_ior;		// current IOR - Index of Refraction
 	};
 }

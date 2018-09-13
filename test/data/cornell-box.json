@@ -24,7 +24,8 @@
 		,{
 			  "type" : "default"
 			, "name" : "purple_ball"
-			, "specular" : [1, 1, 1]
+			, "refraction" : [1, 1, 1]
+			, "IOR" : [1.5, 1.5, 1.5]
 		}
 	]
 	, "shape_list" :

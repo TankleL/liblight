@@ -95,6 +95,20 @@ namespace Light
 						new_mtrl->set_color(DefaultMaterial::SPECULAR, clr);
 					}
 
+					if (mtrl.HasMember("refraction") && mtrl["refraction"].IsArray())
+					{
+						rapidjson::Value jsClr = mtrl["refraction"].GetArray();
+						Math::Color clr(jsClr[0].GetDouble(), jsClr[1].GetDouble(), jsClr[2].GetDouble());
+						new_mtrl->set_color(DefaultMaterial::REFRACT, clr);
+					}
+
+					if (mtrl.HasMember("IOR") && mtrl["IOR"].IsArray())
+					{
+						rapidjson::Value jsClr = mtrl["IOR"].GetArray();
+						Math::Color clr(jsClr[0].GetDouble(), jsClr[1].GetDouble(), jsClr[2].GetDouble());
+						new_mtrl->set_color(DefaultMaterial::IOR, clr);
+					}
+
 					if (mtrl.HasMember("name") && mtrl["name"].IsString())
 					{
 						out.add_material(mtrl["name"].GetString(), new_mtrl);

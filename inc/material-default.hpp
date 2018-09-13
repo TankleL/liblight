@@ -42,7 +42,8 @@ namespace Light
 			DIFFUSE = 1,
 			SPECULAR = 2,
 			REFRACT = 4,
-			EMISSIVE = 8
+			EMISSIVE = 8,
+			IOR = 16,			// Index of Refraction
 		};
 
 	public:

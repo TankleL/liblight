@@ -46,6 +46,11 @@ namespace Light
 			Color(decimal r, decimal g, decimal b) : m_r(r), m_g(g), m_b(b) { }
 			explicit Color(decimal f) : m_r(f), m_g(f), m_b(f) { }
 
+			decimal sum_chnl() const
+			{
+				return m_r + m_g + m_b;
+			}
+
 			void clamp(decimal min = 0.0f, decimal max = 1.0f)
 			{
 				m_r = std::max(min, std::min(max, m_r));
