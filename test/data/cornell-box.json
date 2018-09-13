@@ -25,7 +25,7 @@
 			  "type" : "default"
 			, "name" : "purple_ball"
 			, "refraction" : [1, 1, 1]
-			, "IOR" : [1.5, 1.5, 1.5]
+			, "IOR" : [1.2, 1.2, 1.2]
 		}
 	]
 	, "shape_list" :

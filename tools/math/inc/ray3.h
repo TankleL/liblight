@@ -42,7 +42,8 @@ namespace Light
 	{
 		class Ray3
 		{
-		public:			
+		public:
+			Ray3();
 			Ray3(const Point3& origin, const Vector3& direction);
 			Ray3(const Ray3& rhs);
 			Ray3(Ray3&& rhs);
@@ -58,6 +59,9 @@ namespace Light
 			Point3		m_origin;
 			Vector3		m_direction;
 		};
+
+		inline Ray3::Ray3()
+		{}
 
 		inline Ray3::Ray3(const Point3& origin, const Vector3& direction) :
 			m_origin(origin),
@@ -83,7 +87,8 @@ namespace Light
 
 		inline Ray3& Ray3::operator=(Ray3&& rhs)
 		{
-			*this = std::move(rhs);
+			m_direction = rhs.m_direction;
+			m_origin = rhs.m_origin;
 			return *this;
 		}
 

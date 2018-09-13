@@ -51,8 +51,6 @@ namespace Light
 
 	protected:
 		Math::Color _radiance(const Scene& scene, const Math::Ray3& ray_in, int depth);
-		Math::Ray3 _random_ray(const Math::Vector3& normal, const Math::Point3& hit_pos) const;
-		Math::Ray3 _reflect_ray(const Math::Ray3& ray_in, const Math::Point3& hit_point, const Math::Vector3& normal) const;
 
 	protected:
 		std::shared_ptr<Camera>	m_camera;
