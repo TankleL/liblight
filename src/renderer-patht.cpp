@@ -132,8 +132,8 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 	Ray3 cray(Point3(0.f, 0.f, 0.f), Vector3(0.f, 0.f, 1.f));
 	for (decimal y = 0; y < rh; y += 1.0)
 	{
-		//printf("\rrendering, current row = %d, progress = %3.2f%%", (int)y, y / rh * 100.0);
-		//fflush(stdout);
+		printf("\rrendering, current row = %d, progress = %3.2f%%", (int)y, y / rh * 100.0);
+		fflush(stdout);
 
 #pragma omp parallel for schedule(dynamic, 1) private(cray)
 		for (int x = 0; x < (int)rw; ++x)
@@ -183,30 +183,29 @@ Math::Color RdrrPathTracing::_radiance(const Scene& scene, const Math::Ray3& ray
 				const DefaultMaterial* mtrl = 
 					static_cast<const DefaultMaterial*>(hit_info.mtrl);
 
-				
-
 				const Point3& x = hit_info.inters.m_hit_point;
 				const Vector3& n = hit_info.inters.m_normal;
 				const Ray3& r = ray_in;
 
 				bool is_going_in = n.dot(r.m_direction) < 0;
-				const Vector3 n_o = is_going_in ? n : -1 * n;	// normal - outside of shape.
 
-				if (mtrl->has_property(DefaultMaterial::DIFFUSE)&& is_going_in)
+				if (mtrl->has_property(DefaultMaterial::DIFFUSE))
 				{
 					output += mtrl->get_color(DefaultMaterial::DIFFUSE) *
 						_radiance(scene, random_ray(n, x), depth);
 				}
 
-				if (mtrl->has_property(DefaultMaterial::SPECULAR))
+				if (mtrl->has_property(DefaultMaterial::SPECULAR) && is_going_in)
 				{
-//					output += mtrl->get_color(DefaultMaterial::SPECULAR) *
-//						_radiance(scene, reflect_ray(ray_in, x, n), depth);
+					output += mtrl->get_color(DefaultMaterial::SPECULAR) *
+						_radiance(scene, reflect_ray(ray_in, x, n), depth);
 				}
 
 				if (mtrl->has_property(DefaultMaterial::REFRACT) &&
 					mtrl->has_property(DefaultMaterial::IOR))
 				{
+					const Vector3 n_o = is_going_in ? n : -1 * n;	// normal - outside of shape.
+
 					DoubleRay dr = refract_ray(
 						is_going_in ?
 						1.0/ mtrl->get_color(DefaultMaterial::IOR).m_r :
@@ -215,15 +214,14 @@ Math::Color RdrrPathTracing::_radiance(const Scene& scene, const Math::Ray3& ray
 
 					if (dr.valid_ray_count == 1)
 					{
-//						output += mtrl->get_color(DefaultMaterial::REFRACT) *
-//							_radiance(scene, dr.r1, depth);
+						output += mtrl->get_color(DefaultMaterial::REFRACT) *
+							_radiance(scene, dr.r1, depth);
 					}
 					else if (dr.valid_ray_count == 2)
 					{
 //						output += mtrl->get_color(DefaultMaterial::REFRACT) *
-//							_radiance(scene, dr.r1, depth);
-						assert(r.m_direction == dr.r2.m_direction);
-						assert(x == dr.r2.m_origin);
+//							_radiance(scene, dr.r1, depth) * 0.5;
+
 						output += mtrl->get_color(DefaultMaterial::REFRACT) *
 							_radiance(scene, dr.r2, depth);
 					}
