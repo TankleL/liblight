@@ -90,9 +90,9 @@ namespace Light
 
 		inline Point3& Point3::operator=(Point3&& rhs)
 		{
-			m_x = std::move(rhs.m_x);
-			m_y = std::move(rhs.m_y);
-			m_z = std::move(rhs.m_z);
+			m_x = rhs.m_x;
+			m_y = rhs.m_y;
+			m_z = rhs.m_z;
 			m_w = 1.0f;
 			return *this;
 		}
@@ -133,9 +133,9 @@ namespace Light
 		inline Point3 operator+(const Vector3& v, const Point3& p)
 		{
 			Point3 res;
-			res.m_x += v.m_x;
-			res.m_y += v.m_y;
-			res.m_z += v.m_z;
+			res.m_x = p.m_x + v.m_x;
+			res.m_y = p.m_y + v.m_y;
+			res.m_z = p.m_z + v.m_z;
 			return res;
 		}
 

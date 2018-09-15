@@ -88,9 +88,9 @@ namespace Light
 		{}
 
 		inline Vector3::Vector3(Vector3&& rhs) :
-			m_x(std::move(rhs.m_x)),
-			m_y(std::move(rhs.m_y)),
-			m_z(std::move(rhs.m_z)),
+			m_x(rhs.m_x),
+			m_y(rhs.m_y),
+			m_z(rhs.m_z),
 			m_w(0.0f)
 		{}
 
@@ -104,9 +104,9 @@ namespace Light
 
 		inline Vector3& Vector3::operator=(Vector3&& rhs)
 		{
-			m_x = std::move(rhs.m_x);
-			m_y = std::move(rhs.m_y);
-			m_z = std::move(rhs.m_z);
+			m_x = rhs.m_x;
+			m_y = rhs.m_y;
+			m_z = rhs.m_z;
 			m_w = 0.0f;
 			return *this;
 		}
@@ -225,14 +225,6 @@ namespace Light
 			res /= div;
 			return res;
 		}
-
-		inline Vector3 operator/(decimal div, const Vector3& v1)
-		{
-			Vector3 res(v1);
-			res /= div;
-			return res;
-		}
-
 	} // namespace Math
 } // namespace Spears
 

@@ -108,13 +108,19 @@ namespace RdrrPathTracingUtil
 
 		return out;
 	}
+
+	inline decimal pixel_turbulent(decimal range = 1.0)
+	{
+		const decimal half_range = range * 0.5;
+		decimal r = DecimalRandom::dice(range) - half_range;
+		return (r >= 0 ? -r : r) + half_range;
+	}
 }
 
 RdrrPathTracing::RdrrPathTracing(int sample_scale,
 	int max_radiance_depth)
 	: m_sample_scale(sample_scale)
 	, m_max_radiance_depth(max_radiance_depth)
-	, m_cur_ior(1, 1, 1)
 {}
 
 void RdrrPathTracing::set_camera(std::shared_ptr<Camera> camera)
@@ -124,6 +130,8 @@ void RdrrPathTracing::set_camera(std::shared_ptr<Camera> camera)
 
 void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 {
+	using namespace RdrrPathTracingUtil;
+
 	const decimal rw = (decimal)output.get_resolution().get_width();
 	const decimal rh = (decimal)output.get_resolution().get_height();
 	const decimal h_rw = rw * 0.5;
@@ -132,7 +140,7 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 	Ray3 cray(Point3(0.f, 0.f, 0.f), Vector3(0.f, 0.f, 1.f));
 	for (decimal y = 0; y < rh; y += 1.0)
 	{
-		printf("\rrendering, current row = %d, progress = %3.2f%%", (int)y, y / rh * 100.0);
+		printf("\rrendering, current row = %d, progress = %3.2f%%", (int)y, y / (rh-1) * 100.0);
 		fflush(stdout);
 
 #pragma omp parallel for schedule(dynamic, 1) private(cray)
@@ -142,8 +150,8 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 			Color c_shade;
 			for (int s = 0; s < m_sample_scale; ++s)
 			{
-				const decimal px = ((decimal)x - h_rw + DecimalRandom::dice() - 0.5) / rw;
-				const decimal py = (y - h_rh + DecimalRandom::dice() - 0.5) / rh;
+				const decimal px = ((decimal)x - h_rw + pixel_turbulent(2)) / rw;
+				const decimal py = (y - h_rh + pixel_turbulent(2)) / rh;
 
 				m_camera->generate_ray(cray, px, py);
 				Color s_shade;
@@ -161,19 +169,24 @@ Math::Color RdrrPathTracing::_radiance(const Scene& scene, const Math::Ray3& ray
 {
 	using namespace RdrrPathTracingUtil;
 
-	Math::Color output;
-	bool quit = false;
+	Math::Color output(m_back_clr);
+	bool hit = false;
 	
 	Scene::HitInfo hit_info;
-	quit = !scene.hit_detect(hit_info, ray_in);
+	hit = scene.hit_detect(hit_info, ray_in);
 
-	if (!quit)
-	{	
+	if (hit)
+	{
 		if (depth > m_max_radiance_depth)
 		{ // Russian Roulette
 			// Stop the recursion randomly based on the surface reflectivity.
 			// TODO: impl R.R.
-			return m_back_clr;
+
+			if ("default" == hit_info.mtrl->type() &&
+				((const DefaultMaterial*)hit_info.mtrl)->has_property(DefaultMaterial::EMISSIVE))
+			{
+				return output + ((const DefaultMaterial*)hit_info.mtrl)->get_color(DefaultMaterial::EMISSIVE);
+			}
 		}
 		else
 		{
@@ -188,27 +201,14 @@ Math::Color RdrrPathTracing::_radiance(const Scene& scene, const Math::Ray3& ray
 				const Ray3& r = ray_in;
 
 				bool is_going_in = n.dot(r.m_direction) < 0;
-
-				if (mtrl->has_property(DefaultMaterial::DIFFUSE))
-				{
-					output += mtrl->get_color(DefaultMaterial::DIFFUSE) *
-						_radiance(scene, random_ray(n, x), depth);
-				}
-
-				if (mtrl->has_property(DefaultMaterial::SPECULAR) && is_going_in)
-				{
-					output += mtrl->get_color(DefaultMaterial::SPECULAR) *
-						_radiance(scene, reflect_ray(ray_in, x, n), depth);
-				}
+				const Vector3 n_o = is_going_in ? n : -1 * n;	// normal - outside of shape.
 
 				if (mtrl->has_property(DefaultMaterial::REFRACT) &&
 					mtrl->has_property(DefaultMaterial::IOR))
 				{
-					const Vector3 n_o = is_going_in ? n : -1 * n;	// normal - outside of shape.
-
 					DoubleRay dr = refract_ray(
 						is_going_in ?
-						1.0/ mtrl->get_color(DefaultMaterial::IOR).m_r :
+						1.0 / mtrl->get_color(DefaultMaterial::IOR).m_r :
 						mtrl->get_color(DefaultMaterial::IOR).m_r,
 						r, x, n_o);
 
@@ -227,9 +227,24 @@ Math::Color RdrrPathTracing::_radiance(const Scene& scene, const Math::Ray3& ray
 					}
 				}
 
-				if (mtrl->has_property(DefaultMaterial::EMISSIVE))
+				if (is_going_in)
 				{
-					output += mtrl->get_color(DefaultMaterial::EMISSIVE);
+					if (mtrl->has_property(DefaultMaterial::DIFFUSE))
+					{
+						const Color diffuse = mtrl->get_color(DefaultMaterial::DIFFUSE);
+						output += diffuse * _radiance(scene, random_ray(n, x), depth);
+					}
+
+					if (mtrl->has_property(DefaultMaterial::SPECULAR))
+					{
+						output += mtrl->get_color(DefaultMaterial::SPECULAR) *
+							_radiance(scene, reflect_ray(ray_in, x, n), depth);
+					}
+
+					if (mtrl->has_property(DefaultMaterial::EMISSIVE))
+					{
+						output += mtrl->get_color(DefaultMaterial::EMISSIVE);
+					}
 				}
 			}
 		}

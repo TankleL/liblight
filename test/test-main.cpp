@@ -14,17 +14,25 @@ using namespace Light::Math;
 int main(int argc, char** argv)
 {
 	TileScene scn;
-	RdrrPathTracing rdr(2000, 6);
-	Texture2D rt(Math::Resolution(600, 300));
+	RdrrPathTracing rdr(2000, 5);
+	Texture2D rt(Math::Resolution(640, 360));
 
-	shared_ptr<DefaultCamera> cam = make_shared<DefaultCamera>(22.0, 11.0);
+	shared_ptr<DefaultCamera> cam = make_shared<DefaultCamera>(16, 9, 6);
+	cam->move_z(-1.1);
 	rdr.set_camera(cam);
 
 	if (SimpleReader::parse_json(scn, "../../test/data/cornell-box.json"))
 	{
-		rdr.render(rt, scn);
-		
-		ImgUtil::save_texture_as_ppm6("output.ppm", rt);
+		const int frame_count = 1;
+		for (int i = 0; i < frame_count; ++i)
+		{
+			rdr.render(rt, scn);
+			std::ostringstream oss;
+			oss << "output-" << i << ".ppm";
+			ImgUtil::save_texture_as_ppm6(oss.str(), rt);
+
+			cam->move_z(0.1);
+		}
 	}
 
 	return 0;

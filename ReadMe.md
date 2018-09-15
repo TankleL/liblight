@@ -32,17 +32,25 @@ Please use cmake to build liblight out-of-source.
 	int main(int argc, char** argv)
 	{
 		TileScene scn;
-		RdrrPathTracing rdr(2000, 6);
-		Texture2D rt(Math::Resolution(600, 300));
+		RdrrPathTracing rdr(2000, 5);
+		Texture2D rt(Math::Resolution(640, 360));
 	
-		shared_ptr<DefaultCamera> cam = make_shared<DefaultCamera>(22.0, 11.0);
+		shared_ptr<DefaultCamera> cam = make_shared<DefaultCamera>(16, 9, 6);
+		cam->move_z(-1.1);
 		rdr.set_camera(cam);
 	
 		if (SimpleReader::parse_json(scn, "../../test/data/cornell-box.json"))
 		{
-			rdr.render(rt, scn);
-			
-			ImgUtil::save_texture_as_ppm6("output.ppm", rt);
+			const int frame_count = 1;
+			for (int i = 0; i < frame_count; ++i)
+			{
+				rdr.render(rt, scn);
+				std::ostringstream oss;
+				oss << "output-" << i << ".ppm";
+				ImgUtil::save_texture_as_ppm6(oss.str(), rt);
+	
+				cam->move_z(0.1);
+			}
 		}
 	
 		return 0;
@@ -50,7 +58,7 @@ Please use cmake to build liblight out-of-source.
 
 
 **test/data/cornell-box.json**:
-	
+
 	{
 		  "mtrl_list" :
 		[
@@ -72,18 +80,19 @@ Please use cmake to build liblight out-of-source.
 			,{
 				  "type" : "default"
 				, "name" : "white_light"
-				, "emissive" : [8, 8, 8]
+				, "emissive" : [16, 16, 16]
 			}
 			,{
 				  "type" : "default"
 				, "name" : "refrac_ball"
 				, "refraction" : [1, 1, 1]
-				, "IOR" : [1.3, 1, 1]
+				, "IOR" : [1.7, 1, 1]
 			}
 			,{
 				  "type" : "default"
 				, "name" : "mirror_ball"
-				, "specular" : [1, 1, 1]
+				, "diffuse" : [0.4, 0.4, 0.4]
+				, "specular" : [0.6, 0.6, 0.6]
 			}
 		]
 		, "shape_list" :
@@ -92,15 +101,15 @@ Please use cmake to build liblight out-of-source.
 				  "type" : "sphere"
 				, "mtrl" : "white_light"
 				, "radius" : 5
-				, "pos" : [0, 6.6, 2.88]
+				, "pos" : [0, 6.6, 2.5]
 				, "_comment" : "light"
 			}
 			,{
 				  "type" : "rectangle"
 				, "mtrl" : "white_obj"
 				, "pos" : [
-					-2, 1.7, -1,
-					 2, 1.7, -1,
+					-2, 1.7, -10,
+					 2, 1.7, -10,
 					 2, 1.7, 4,
 					-2, 1.7, 4
 					 ]
@@ -110,28 +119,28 @@ Please use cmake to build liblight out-of-source.
 				  "type" : "rectangle"
 				, "mtrl" : "white_obj"
 				, "pos" : [
-					-2, -1.8, -1,
+					-2, -1.8, -10,
 					-2, -1.8, 4,
 					 2, -1.8, 4,
-					 2, -1.8, -1]
+					 2, -1.8, -10]
 				, "_comment" : "box-bottom"
 			}
 			,{
 				  "type" : "rectangle"
 				, "mtrl" : "green_obj"
 				, "pos" : [
-					2, -1.8, -1,
+					2, -1.8, -10,
 					2, -1.8, 4,
 					2,  1.7, 4,
-					2,  1.7, -1]
+					2,  1.7, -10]
 				, "_comment" : "box-right"
 			}
 			,{
 				  "type" : "rectangle"
 				, "mtrl" : "blue_obj"
 				, "pos" : [
-					-2, -1.8, -1,
-					-2,  1.7, -1,
+					-2, -1.8, -10,
+					-2,  1.7, -10,
 					-2,  1.7, 4,
 					-2, -1.8, 4]
 				, "_comment" : "box-left"
@@ -150,38 +159,37 @@ Please use cmake to build liblight out-of-source.
 				  "type" : "rectangle"
 				, "mtrl" : "white_obj"
 				, "pos" : [
-					-2, -1.8, -1,
-					 2, -1.8, -1,
-					 2,  1.7, -1,
-					-2,  1.7, -1]
+					-2, -1.8, -10,
+					 2, -1.8, -10,
+					 2,  1.7, -10,
+					-2,  1.7, -10]
 				, "_comment" : "box-front"
 			}
 			,{
-				  "type" : "rectangle"
+				  "type" : "sphere"
 				, "mtrl" : "refrac_ball"
-				, "pos" : [
-					-1.8, -1.8, 2.8,
-					 0.8, -1.8, 2.8,
-					 0.8, -0.8, 2.8,
-					-1.8, -0.8, 2.8]
-				, "_comment" : "glass-back"
-			}
-			,{
-				  "type" : "rectangle"
-				, "mtrl" : "refrac_ball"
-				, "pos" : [
-					-1.8, -1.8, 3,
-					-1.8, -0.8, 3,				
-					 0.8, -0.8, 3,
-					 0.8, -1.8, 3]
-				, "_comment" : "glass-front"
+				, "radius" : 0.5
+				, "pos" : [0.8, -1.3, 2]
+				, "_comment" : "refract-sphere"
 			}
 			,{
 				  "type" : "sphere"
 				, "mtrl" : "mirror_ball"
 				, "radius" : 0.5
-				, "pos" : [0, -1.3, 2]
+				, "pos" : [-0.8, -1.3, 2]
 				, "_comment" : "mirror-sphere"
 			}
 		]
 	}
+
+## 3. Unsupported But Coming Soon Features
+
+- Fresnel-Refraction
+- Box-Shape
+- Scene Node Management
+- Scene Node Transform
+- Cascading Scene
+- K-D Tree
+- Octree
+- Depth of Field
+- Rich Materials

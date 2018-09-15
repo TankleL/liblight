@@ -40,20 +40,22 @@ namespace Light
 
 #if defined(ACCURACY_DOUBLE)
 		typedef	double	decimal;
-		const static decimal epsilon = 1e-8;
-		const static decimal infinity = INFINITY;
-		const static decimal zero = 0e0;
-		const static decimal pi = 3.141592653589793;
-		const static decimal h_pi = 1.570796326794896;
-		const static decimal d_pi = 6.283185307179586;
+		const static decimal epsilon	= 1e-8;
+		const static decimal infinity	= INFINITY;
+		const static decimal zero		= 0e0;
+		const static decimal pi			= 3.141592653589793;
+		const static decimal h_pi		= 1.570796326794896;
+		const static decimal d_pi		= 6.283185307179586;
+		const static decimal e			= 2.718281828459045;
 #else
 		typedef float	decimal;
-		const static decimal epsilon = 0.00001f;
-		const static decimal zero = 0.0f;
-		const static decimal infinity = INFINITY;
-		const static decimal pi = 3.141592f;
-		const static decimal h_pi = 1.5707963f;
-		const static decimal d_pi = 6.2831853f;
+		const static decimal epsilon	= 0.00001f;
+		const static decimal zero		= 0.0f;
+		const static decimal infinity	= INFINITY;
+		const static decimal pi			= 3.141592f;
+		const static decimal h_pi		= 1.5707963f;
+		const static decimal d_pi		= 6.2831853f;
+		const static decimal e			= 2.7182818f;
 #endif
 		typedef decimal				scalar;
 

@@ -1,0 +1,66 @@
+{
+	  "mtrl_list" :
+	[
+		{
+			  "type" : "default"
+			, "name" : "white_obj"
+			, "diffuse" : [0.8, 0.8, 0.8]
+		}
+		,{
+			  "type" : "default"
+			, "name" : "blue_obj"
+			, "diffuse" : [0.2, 0.3, 1]
+		}
+		,{
+			  "type" : "default"
+			, "name" : "green_obj"
+			, "diffuse" : [0.2, 1, 0.4]
+		}
+		,{
+			  "type" : "default"
+			, "name" : "white_light"
+			, "emissive" : [20, 20, 20]
+		}
+		,{
+			  "type" : "default"
+			, "name" : "refrac_ball"
+			, "refraction" : [1, 1, 1]
+			, "IOR" : [1.7, 1, 1]
+		}
+		,{
+			  "type" : "default"
+			, "name" : "mirror_ball"
+			, "specular" : [0.8, 0.8, 0.8]
+		}
+	]
+	, "shape_list" :
+	[
+		{
+			  "type" : "sphere"
+			, "mtrl" : "white_light"
+			, "radius" : 0.5
+			, "pos" : [0, 1, 0]
+			, "_comment" : "light"
+		}
+		,{
+			  "type" : "rectangle"
+			, "mtrl" : "white_obj"
+			, "pos" : [
+				-100, 3, -100,
+				 100, 3, -100,
+				 100, 3,  100,
+				-100, 3,  100]
+			, "_comment" : "top"
+		}
+		,{
+			  "type" : "rectangle"
+			, "mtrl" : "white_obj"
+			, "pos" : [
+				-100, -1, -100,
+				-100, -1,  100,
+				 100, -1,  100,
+				 100, -1, -100]
+			, "_comment" : "bottom"
+		}
+	]
+}

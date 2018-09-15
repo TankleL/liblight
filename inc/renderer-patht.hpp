@@ -59,6 +59,5 @@ namespace Light
 
 	protected:
 		Math::Color m_back_clr;
-		Math::Color	m_cur_ior;		// current IOR - Index of Refraction
 	};
 }
