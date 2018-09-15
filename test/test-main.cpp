@@ -14,10 +14,10 @@ using namespace Light::Math;
 int main(int argc, char** argv)
 {
 	TileScene scn;
-	RdrrPathTracing rdr(600, 6);
-	Texture2D rt(Math::Resolution(600, 600));
+	RdrrPathTracing rdr(2000, 6);
+	Texture2D rt(Math::Resolution(600, 300));
 
-	shared_ptr<DefaultCamera> cam = make_shared<DefaultCamera>(10.0, 10.0);
+	shared_ptr<DefaultCamera> cam = make_shared<DefaultCamera>(22.0, 11.0);
 	rdr.set_camera(cam);
 
 	if (SimpleReader::parse_json(scn, "../../test/data/cornell-box.json"))
