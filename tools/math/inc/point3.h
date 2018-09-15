@@ -124,9 +124,9 @@ namespace Light
 		inline Point3 operator+(const Point3& p, const Vector3& v)
 		{
 			Point3 res;
-			res.m_x += v.m_x;
-			res.m_y += v.m_y;
-			res.m_z += v.m_z;
+			res.m_x = p.m_x + v.m_x;
+			res.m_y = p.m_y + v.m_y;
+			res.m_z = p.m_z + v.m_z;
 			return res;
 		}
 

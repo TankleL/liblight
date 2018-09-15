@@ -66,7 +66,7 @@ namespace RdrrPathTracingUtil
 		Vector3 v = w.cross(u);
 		Vector3 dir = u * cos(ra)*rb_sqrt + v * sin(ra)*rb_sqrt + w * sqrt(1 - rb);
 		dir.normalize();
-		return Ray3(hit_pos, dir);
+		return Ray3(hit_pos + dir * epsilon, dir);
 	}
 
 	inline Math::Ray3 reflect_ray(
@@ -74,22 +74,20 @@ namespace RdrrPathTracingUtil
 		const Math::Point3& hit_point,
 		const Math::Vector3& normal)
 	{
-		return Ray3(hit_point, ray_in.m_direction - normal * 2 * normal.dot(ray_in.m_direction));
+		Vector3 dir = ray_in.m_direction - normal * 2 * normal.dot(ray_in.m_direction);
+		return Ray3(hit_point + dir * epsilon, dir);
 	}
 
 	inline DoubleRay refract_ray(
-		decimal ni,
-		decimal nt,
+		decimal ior,
 		const Math::Ray3& ray_in,
 		const Math::Point3& hit_point,
 		const Math::Vector3& nr)
 	{
 		DoubleRay out;
 
-		const decimal nnr = ni / nt;
-		const decimal nnr_sq = nnr * nnr;
 		const decimal idn = ray_in.m_direction.dot(nr);
-		const decimal cost_sq = 1.0 - nnr_sq * (1 - idn * idn);
+		const decimal cost_sq = 1.0 - (ior * ior) * (1 - idn * idn);
 
 		if (cost_sq < 0) // Total internal reflection
 		{
@@ -102,10 +100,10 @@ namespace RdrrPathTracingUtil
 			out.r1 = reflect_ray(ray_in, hit_point, nr);
 
 			out.r2.m_direction =
-				nnr * ray_in.m_direction -
-				nr * (nnr * idn + sqrt(cost_sq));
+				ior * ray_in.m_direction -
+				nr * (ior * idn + sqrt(cost_sq));
 			out.r2.m_direction.normalize();
-			out.r2.m_origin = hit_point;
+			out.r2.m_origin = hit_point + out.r2.m_direction * epsilon;
 		}
 
 		return out;
@@ -134,15 +132,17 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 	Ray3 cray(Point3(0.f, 0.f, 0.f), Vector3(0.f, 0.f, 1.f));
 	for (decimal y = 0; y < rh; y += 1.0)
 	{
-		printf("\rrendering, current row = %d, progress = %3.2f%%", (int)y, y / rh * 100.0);
-		fflush(stdout);
-		for (decimal x = 0; x < rw; x += 1.0)
+		//printf("\rrendering, current row = %d, progress = %3.2f%%", (int)y, y / rh * 100.0);
+		//fflush(stdout);
+
+#pragma omp parallel for schedule(dynamic, 1) private(cray)
+		for (int x = 0; x < (int)rw; ++x)
 		{
 			Color pixel;
 			Color c_shade;
 			for (int s = 0; s < m_sample_scale; ++s)
 			{
-				const decimal px = (x - h_rw + DecimalRandom::dice() - 0.5) / rw;
+				const decimal px = ((decimal)x - h_rw + DecimalRandom::dice() - 0.5) / rw;
 				const decimal py = (y - h_rh + DecimalRandom::dice() - 0.5) / rh;
 
 				m_camera->generate_ray(cray, px, py);
@@ -183,44 +183,35 @@ Math::Color RdrrPathTracing::_radiance(const Scene& scene, const Math::Ray3& ray
 				const DefaultMaterial* mtrl = 
 					static_cast<const DefaultMaterial*>(hit_info.mtrl);
 
+				
+
 				const Point3& x = hit_info.inters.m_hit_point;
 				const Vector3& n = hit_info.inters.m_normal;
 				const Ray3& r = ray_in;
 
-				bool is_going_in = n.dot(r.m_direction) > 0;
-				Vector3 nl = is_going_in ?	n * -1 : n;
-				Vector3 nr = is_going_in ? n : n* -1;
+				bool is_going_in = n.dot(r.m_direction) < 0;
+				const Vector3 n_o = is_going_in ? n : -1 * n;	// normal - outside of shape.
 
-				if (mtrl->has_property(DefaultMaterial::DIFFUSE))
+				if (mtrl->has_property(DefaultMaterial::DIFFUSE)&& is_going_in)
 				{
 					output += mtrl->get_color(DefaultMaterial::DIFFUSE) *
-						_radiance(scene, random_ray(nl, x), depth);
+						_radiance(scene, random_ray(n, x), depth);
 				}
 
 				if (mtrl->has_property(DefaultMaterial::SPECULAR))
 				{
-					output += mtrl->get_color(DefaultMaterial::SPECULAR) *
-						_radiance(scene, reflect_ray(ray_in, x, n), depth);
+//					output += mtrl->get_color(DefaultMaterial::SPECULAR) *
+//						_radiance(scene, reflect_ray(ray_in, x, n), depth);
 				}
 
 				if (mtrl->has_property(DefaultMaterial::REFRACT) &&
 					mtrl->has_property(DefaultMaterial::IOR))
 				{
-					decimal ni = m_cur_ior.m_r;
-					decimal nt = mtrl->get_color(DefaultMaterial::IOR).m_r;
-					
-					if (is_going_in)
-					{
-						ni = 1.0;
-						nt = mtrl->get_color(DefaultMaterial::IOR).m_r;
-					}
-					else
-					{
-						ni = mtrl->get_color(DefaultMaterial::IOR).m_r;
-						nt = 1.0;
-					}
-					
-					DoubleRay dr = refract_ray(ni, nt, ray_in, x, nr);
+					DoubleRay dr = refract_ray(
+						is_going_in ?
+						1.0/ mtrl->get_color(DefaultMaterial::IOR).m_r :
+						mtrl->get_color(DefaultMaterial::IOR).m_r,
+						r, x, n_o);
 
 					if (dr.valid_ray_count == 1)
 					{
@@ -231,43 +222,11 @@ Math::Color RdrrPathTracing::_radiance(const Scene& scene, const Math::Ray3& ray
 					{
 //						output += mtrl->get_color(DefaultMaterial::REFRACT) *
 //							_radiance(scene, dr.r1, depth);
+						assert(r.m_direction == dr.r2.m_direction);
+						assert(x == dr.r2.m_origin);
 						output += mtrl->get_color(DefaultMaterial::REFRACT) *
 							_radiance(scene, dr.r2, depth);
 					}
-
-// 					Ray3 ref_ray(x, r.m_direction - n*2*n.dot(r.m_direction));
-// 					bool is_going_in = n.dot(nl) > 0.0;
-// 					decimal nc = 1.0;
-// 					decimal nt = 1.5;
-// 					decimal nnt = is_going_in ? nc / nt : nt / nc, ddn = r.m_direction.dot(nl);
-// 					decimal cos2t = 1 - nnt * nnt*(1 - ddn * ddn);
-// 
-// 					if (cos2t < 0) // // Total internal reflection
-// 					{
-// 						Color refr;
-// 						if (_radiance(refr, scene, ref_ray, depth))
-// 						{
-// 							output += mtrl->get_color(DefaultMaterial::REFRACT) * refr;
-// 						}
-// 					}
-// 					else
-// 					{
-// 						Vector3 tdir = (r.m_direction*nnt - n * ((is_going_in ? 1 : -1)*(ddn*nnt + sqrt(cos2t))));
-// 						tdir.normalize();
-// 
-// 						double a = nt - nc, b = nt + nc, R0 = a * a / (b*b), c = 1 - (is_going_in ? -ddn : tdir.dot(n));
-// 						Color refr;
-// 
-// 						if (_radiance(refr, scene, Ray3(x, tdir), depth))
-// 						{
-// 							Color m = mtrl->get_color(DefaultMaterial::REFRACT);
-// 							if (refr.sum_chnl() > 0)
-// 							{
-// 								int r = 0;
-// 							}
-// 							output += mtrl->get_color(DefaultMaterial::REFRACT) * refr;
-// 						}
-// 					}
 				}
 
 				if (mtrl->has_property(DefaultMaterial::EMISSIVE))

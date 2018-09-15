@@ -108,7 +108,7 @@ namespace Light
 
 		inline Point3 Ray3::on_ray(decimal travel) const
 		{
-			return std::move(m_origin + m_direction * travel);
+			return m_origin + (m_direction * travel);
 		}
 
 		class Ray3Utils

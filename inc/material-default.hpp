@@ -57,6 +57,6 @@ namespace Light
 
 	protected:
 		int				m_properties;
-		Math::Color		m_color[5];
+		Math::Color		m_color[6];
 	};
 }
