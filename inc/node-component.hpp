@@ -1,6 +1,5 @@
 /*******************************************************************************
-@module scene-tile
-@remarks tile scene means that it is a scene without tree structure
+@module node component
 
 ==----------------------------------------------------------------------------==
 
@@ -29,40 +28,29 @@ SOFTWARE.
 
 #pragma once
 
-#include "node.hpp"
-#include "scene.hpp"
-#include "../tools/math/inc/mathinc.h"
+#include "prerequisites.hpp"
 
 namespace Light
 {
-	class LIGHT_API TileScene : public Scene
+	/************************************************************************/
+	/*                              DECLARATION                             */
+	/************************************************************************/
+	class LIGHT_API NodeComponent
 	{
 	public:
-		TileScene();
-		virtual ~TileScene();
+		NodeComponent();
+		virtual ~NodeComponent();
 
 	public:
-		virtual bool hit_detect(HitInfo& info, const Math::Ray3& ray_in) const override;
-
-	public:
-		void add_material(const std::string& material_name, const std::shared_ptr<Material>& material);
-		void add_shape(const std::shared_ptr<Math::Shape>& shape, const std::string& material_name);
-
-	protected:
-		struct _ShapeStoreItem
-		{
-			_ShapeStoreItem(const std::shared_ptr<Math::Shape>& the_shape,
-				const std::string& the_material_name)
-				: shape(the_shape)
-				, material_name(the_material_name)
-			{}
-
-			std::shared_ptr<Math::Shape>		shape;
-			std::string							material_name;
-		};
-
-	protected:
-		std::vector<_ShapeStoreItem>								m_shapes;
-		std::unordered_map<std::string, std::shared_ptr<Material>>	m_materials;
+		virtual void update() = 0;
 	};
+
+	/************************************************************************/
+	/*                               DEFINITION                             */
+	/************************************************************************/
+	inline NodeComponent::NodeComponent()
+	{}
+
+	inline NodeComponent::~NodeComponent()
+	{}
 }

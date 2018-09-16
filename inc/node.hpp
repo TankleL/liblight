@@ -28,6 +28,9 @@ SOFTWARE.
 
 #pragma once
 
+#include "prerequisites.hpp"
+#include "node-component.hpp"
+
 namespace Light
 {
 	/************************************************************************/
@@ -80,11 +83,16 @@ namespace Light
 		 */
 		void detach();
 
+	public: // as a node
+		void add_component(const std::shared_ptr<NodeComponent>& component);
+
 	protected:
 		typedef std::vector<Node*> CHILD_CONTAINER_T;
+		typedef std::vector<std::shared_ptr<NodeComponent>> COM_CONTAINER_T;
 
 	protected:
 		CHILD_CONTAINER_T	m_children;
+		COM_CONTAINER_T		m_coms;
 		std::string			m_name;
 		Node*				m_parent;
 	};
@@ -152,5 +160,10 @@ namespace Light
 	{
 		assert(m_parent);
 		m_parent->detach_child(this);
+	}
+
+	inline void Node::add_component(const std::shared_ptr<NodeComponent>& component)
+	{
+		m_coms.push_back(component);
 	}
 }
