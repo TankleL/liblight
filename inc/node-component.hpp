@@ -35,20 +35,31 @@ namespace Light
 	/************************************************************************/
 	/*                              DECLARATION                             */
 	/************************************************************************/
-	class LIGHT_API NodeComponent
+	class LIGHT_API INodeComponentBehavior
+	{
+	public:
+		virtual void update() = 0;
+		virtual void reset() = 0;
+	};
+
+	class Node;
+	class LIGHT_API NodeComponent : public INodeComponentBehavior
 	{
 	public:
 		NodeComponent();
 		virtual ~NodeComponent();
 
 	public:
-		virtual void update() = 0;
+	protected:
+		std::string	m_name;
+		Node*		m_holder;	// the node handling this component. 
 	};
 
 	/************************************************************************/
 	/*                               DEFINITION                             */
 	/************************************************************************/
 	inline NodeComponent::NodeComponent()
+		: m_holder(nullptr)
 	{}
 
 	inline NodeComponent::~NodeComponent()

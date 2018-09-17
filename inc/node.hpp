@@ -39,7 +39,7 @@ namespace Light
 	class LIGHT_API Node
 	{
 	public:
-		Node();
+		Node(const std::string& name);
 		virtual ~Node();
 
 	public:	// as a parent.
@@ -51,7 +51,7 @@ namespace Light
 		 * @retval a point to created child node. do not manage it
 		 * until you called detach_child() method.
 		 */
-		Node* create_child();
+		Node* create_child(const std::string& name);
 
 		/**
 		 * @brief add a child create by other parent node. the child
@@ -65,16 +65,15 @@ namespace Light
 		 * @brief remove a child in this node and release it from memory
 		 * immediately.
 		 *
-		 * @param child_index.
+		 * @param child_name.
 		 */
-		void remove_child(index child_index);
+		void remove_child(const std::string& child_name);
 
 		/**
 		 * @brief detach a child from this node. you have to manage it's
 		 * life-cycle manually.
 		 */
-		void detach_child(index child_index);	
-		void detach_child(Node* child_ptr);
+		Node* detach_child(const std::string& child_name);
 
 	public:	// as a child
 		/**
@@ -84,11 +83,21 @@ namespace Light
 		void detach();
 
 	public: // as a node
-		void add_component(const std::shared_ptr<NodeComponent>& component);
+		/**
+		* @brief get the name of this node
+		*/
+		std::string get_name() const;
+
+		void add_component(
+			const std::string& name,
+			const std::shared_ptr<NodeComponent>& component);
 
 	protected:
-		typedef std::vector<Node*> CHILD_CONTAINER_T;
-		typedef std::vector<std::shared_ptr<NodeComponent>> COM_CONTAINER_T;
+		typedef std::unordered_map<std::string, Node*>
+			CHILD_CONTAINER_T;
+		typedef std::unordered_map<std::string,
+			std::shared_ptr<NodeComponent>>
+			COM_CONTAINER_T;
 
 	protected:
 		CHILD_CONTAINER_T	m_children;
@@ -101,8 +110,9 @@ namespace Light
 	/************************************************************************/
 	/*                              DEFINITION                              */
 	/************************************************************************/
-	inline Node::Node()
-		: m_parent(nullptr)
+	inline Node::Node(const std::string& name)
+		: m_name(name)
+		, m_parent(nullptr)
 	{}
 
 	inline Node::~Node()
@@ -110,67 +120,66 @@ namespace Light
 		for (CHILD_CONTAINER_T::iterator iter = m_children.begin();
 			iter != m_children.end();
 			++iter)
-		{
-			if (*iter)
-			{
-				delete (*iter);
-			}
-		}
+			if (iter->second)
+				delete (iter->second);
 	}
 
-	inline Node* Node::create_child()
+	inline Node* Node::create_child(const std::string& name)
 	{
-		Node* cn = new Node();
-		m_children.push_back(cn);
+		assert(m_children[name] == NULL);
+		Node* cn = new Node(name);
+		cn->m_parent = this;
+		m_children[name] = cn;
 		return cn;
 	}
 
 	inline void Node::add_child(Node* other_node_child)
 	{
 		assert(other_node_child->m_parent == nullptr);
-		m_children.push_back(other_node_child);
+		assert(m_children[other_node_child->get_name()] == nullptr);
+		m_children[other_node_child->get_name()] = other_node_child;
 		other_node_child->m_parent = this;
 	}
 
-	inline void Node::remove_child(index child_index)
+	inline void Node::remove_child(const std::string& child_name)
 	{
-		assert(child_index < m_children.size());
-		CHILD_CONTAINER_T::iterator child = m_children.begin() + child_index;
-		safe_delete(*child);
-		m_children.erase(child);
-	}
-
-	inline void Node::detach_child(index child_index)
-	{
-		assert(child_index < m_children.size());
-		CHILD_CONTAINER_T::iterator child = m_children.begin() + child_index;
-		(*child)->m_parent = nullptr;
-		m_children.erase(child);
-	}
-
-	inline void Node::detach_child(Node* child_ptr)
-	{
-		for (CHILD_CONTAINER_T::iterator iter = m_children.begin();
-			iter != m_children.end();
-			++iter)
+		CHILD_CONTAINER_T::iterator child = m_children.find(child_name);
+		if (child != m_children.end())
 		{
-			if ((*iter) == child_ptr)
-			{
-				(*iter)->m_parent = nullptr;
-				m_children.erase(iter);
-				break;
-			}
+			if(child->second)
+				delete child->second;
+			m_children.erase(child);
 		}
 	}
 
+	inline Node* Node::detach_child(const std::string& child_name)
+	{
+		Node* res = nullptr;
+		CHILD_CONTAINER_T::iterator child = m_children.find(child_name);
+		if (child != m_children.end())
+		{
+			res = child->second;
+			child->second->m_parent = nullptr;
+			m_children.erase(child);
+		}
+		return res;
+	}
+	
 	inline void Node::detach()
 	{
 		assert(m_parent);
-		m_parent->detach_child(this);
+		m_parent->detach_child(get_name());
 	}
 
-	inline void Node::add_component(const std::shared_ptr<NodeComponent>& component)
+	inline std::string Node::get_name() const
 	{
-		m_coms.push_back(component);
+		return m_name;
+	}
+
+	inline void Node::add_component(
+		const std::string& name,
+		const std::shared_ptr<NodeComponent>& component)
+	{
+		m_coms[name] = component;
 	}
 }
