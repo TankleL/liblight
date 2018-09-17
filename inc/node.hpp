@@ -107,8 +107,15 @@ namespace Light
 
 	inline Node::~Node()
 	{
-		for (const auto& child : m_children)
-			safe_delete(child);
+		for (CHILD_CONTAINER_T::iterator iter = m_children.begin();
+			iter != m_children.end();
+			++iter)
+		{
+			if (*iter)
+			{
+				delete (*iter);
+			}
+		}
 	}
 
 	inline Node* Node::create_child()
@@ -121,7 +128,7 @@ namespace Light
 	inline void Node::add_child(Node* other_node_child)
 	{
 		assert(other_node_child->m_parent == nullptr);
-		m_children->push_back(other_node_child);
+		m_children.push_back(other_node_child);
 		other_node_child->m_parent = this;
 	}
 
