@@ -35,6 +35,8 @@ SOFTWARE.
 #include "../inc/renderer-patht.hpp"
 #include "../inc/material-default.hpp"
 
+#include <time.h>
+
 using namespace Light;
 using namespace Light::Math;
 
@@ -137,6 +139,7 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 	const decimal h_rw = rw * 0.5;
 	const decimal h_rh = rh * 0.5;
 
+	clock_t t = clock();
 	Ray3 cray(Point3(0.f, 0.f, 0.f), Vector3(0.f, 0.f, 1.f));
 	for (decimal y = 0; y < rh; y += 1.0)
 	{
@@ -162,6 +165,10 @@ void RdrrPathTracing::render(Texture2D& output, const Scene& scene)
 			output.set_pixel((int)x, (int)y, pixel);
 		}
 	}
+
+	t = clock() - t;
+	printf("; summary: clock(%d), time-elapsed(%f seconds)", t, (float)t/ CLOCKS_PER_SEC);
+
 	printf("\n");
 }
 
