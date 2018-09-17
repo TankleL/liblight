@@ -75,6 +75,11 @@ namespace Light
 		 */
 		Node* detach_child(const std::string& child_name);
 
+		/**
+		 * @brief looking for a child by the specified name with BFS methods.
+		 */
+		Node* get_child(const std::string& child_name) const;
+
 	public:	// as a child
 		/**
 		 * @brief detach from parent. you have to manage this node's life-
@@ -91,6 +96,11 @@ namespace Light
 		void add_component(
 			const std::string& name,
 			const std::shared_ptr<NodeComponent>& component);
+
+		void remove_component(const std::string& name);
+
+		NodeComponent* get_component(
+			const std::string& name) const;
 
 	protected:
 		typedef std::unordered_map<std::string, Node*>
@@ -164,6 +174,26 @@ namespace Light
 		}
 		return res;
 	}
+
+	inline Node* Node::get_child(const std::string& child_name) const
+	{
+		Node* found = nullptr;
+		CHILD_CONTAINER_T::const_iterator citer = m_children.find(child_name);
+		if (citer != m_children.end())
+			found = citer->second;
+		else
+		{
+			for (CHILD_CONTAINER_T::const_iterator citer = m_children.begin();
+				citer != m_children.end();
+				++citer)
+			{
+				found = citer->second->get_child(child_name);
+				if (found)
+					break;
+			}
+		}
+		return found;
+	}
 	
 	inline void Node::detach()
 	{
@@ -181,5 +211,19 @@ namespace Light
 		const std::shared_ptr<NodeComponent>& component)
 	{
 		m_coms[name] = component;
+	}
+
+	inline void Node::remove_component(
+		const std::string& name)
+	{
+		COM_CONTAINER_T::iterator iter = m_coms.find(name);
+		if (iter != m_coms.end())
+			m_coms.erase(iter);
+	}
+
+	inline NodeComponent* Node::get_component(
+		const std::string& name) const
+	{
+		return m_coms.at(name).get();
 	}
 }
