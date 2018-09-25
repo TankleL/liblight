@@ -1,10 +1,10 @@
 /* ****************************************************************************
-@module default-camera
+@module usual-camera
 
-@brief this is a pinhole module camera.
+@brief this is a usual camera, which supports Depth-of-Field.
 -------------------------------------------------------------------------------
 
-Copyright (c) 2017, Tain L.
+Copyright (c) 2018, Tain L.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,30 +31,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "camera.hpp"
+#include "prerequisites.hpp"
+#include "camera-default.hpp"
 
 namespace Light
 {
-	class LIGHT_API DefaultCamera : public Camera
+	class LIGHT_API UsualCamera : public DefaultCamera
 	{
 	public:
-		DefaultCamera(Math::decimal filmplane_width = 16.0f,
+		UsualCamera(
+			Math::decimal filmplane_width = 16.0f,
 			Math::decimal filmplane_height = 9.0f,
-			Math::decimal filmplane_depth = 5.0f);
-		virtual ~DefaultCamera();
+			Math::decimal filmplane_depth = 5.0f,
+			Math::decimal focus = 30.0f,
+			Math::decimal aperture_radius = 1.0f
+		);
+
+		virtual ~UsualCamera();
 
 	public:
-		/**
-		@interface: generate_ray
-		@param: x_offset means the logic x-position that the ray intersects with the film plane. range is [-0.5, 0.5]
-		@param: y_offset means the logic y-position that the ray intersects with the film plane. range is [-0.5, 0.5]
-		@return: a camera ray
-		*/
 		virtual void generate_ray(Math::Ray3& cray, Math::decimal x_offset, Math::decimal y_offset) override;
 
 	protected:
-		Math::decimal	m_filmplane_width;
-		Math::decimal	m_filmplane_height;
-		Math::decimal	m_filmplane_depth;
+		Math::decimal	m_lens_focus;
+		Math::decimal	m_lens_aperture_radius;
 	};
 }

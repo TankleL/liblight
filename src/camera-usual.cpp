@@ -1,10 +1,10 @@
 /* ****************************************************************************
-@module default-camera
+@module usual-camera
 
-@brief this is a pinhole module camera.
+@brief this is a usual camera, which supports Depth-of-Field.
 -------------------------------------------------------------------------------
 
-Copyright (c) 2017, Tain L.
+Copyright (c) 2018, Tain L.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,32 +29,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
-#pragma once
+#include "api-dev-mod.hpp"
 
-#include "camera.hpp"
+#include "camera-usual.hpp"
 
-namespace Light
+using namespace Light;
+using namespace Light::Math;
+
+UsualCamera::UsualCamera(
+	Math::decimal filmplane_width /* = 16.0f */,
+	Math::decimal filmplane_height /* = 9.0f */,
+	Math::decimal filmplane_depth /* = 5.0f */,
+	Math::decimal focus /* = 30.0f */,
+	Math::decimal aperture_radius /* = 1.0f */ )
+	: DefaultCamera(
+		filmplane_width,
+		filmplane_height,
+		filmplane_depth)
+{}
+
+UsualCamera::~UsualCamera()
+{}
+
+void UsualCamera::generate_ray(Math::Ray3& cray, Math::decimal x_offset, Math::decimal y_offset)
 {
-	class LIGHT_API DefaultCamera : public Camera
-	{
-	public:
-		DefaultCamera(Math::decimal filmplane_width = 16.0f,
-			Math::decimal filmplane_height = 9.0f,
-			Math::decimal filmplane_depth = 5.0f);
-		virtual ~DefaultCamera();
+	// calculate direction of the ray.
+	Math::Vector3 right_bias = m_right;
+	Math::Vector3 up_bias = m_up;
+	right_bias *= (x_offset * m_filmplane_width);
+	up_bias *= (y_offset * m_filmplane_height);
+	Math::Vector3 dir = m_look;
 
-	public:
-		/**
-		@interface: generate_ray
-		@param: x_offset means the logic x-position that the ray intersects with the film plane. range is [-0.5, 0.5]
-		@param: y_offset means the logic y-position that the ray intersects with the film plane. range is [-0.5, 0.5]
-		@return: a camera ray
-		*/
-		virtual void generate_ray(Math::Ray3& cray, Math::decimal x_offset, Math::decimal y_offset) override;
+	dir = m_look;
+	dir *= m_filmplane_depth;
+	dir += right_bias;
+	dir += up_bias;
+	dir.normalize();
 
-	protected:
-		Math::decimal	m_filmplane_width;
-		Math::decimal	m_filmplane_height;
-		Math::decimal	m_filmplane_depth;
-	};
+	Math::Point3 pf = m_position + m_look * m_lens_focus;	// focus point
+
+	// set origin of ray.
+	cray.m_origin = m_position;
 }

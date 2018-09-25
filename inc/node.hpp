@@ -30,6 +30,7 @@ SOFTWARE.
 
 #include "prerequisites.hpp"
 #include "node-component.hpp"
+#include "../tools/math/inc/mathinc.h"
 
 namespace Light
 {
@@ -110,6 +111,7 @@ namespace Light
 			COM_CONTAINER_T;
 
 	protected:
+		Math::Matrix4		m_transform;
 		CHILD_CONTAINER_T	m_children;
 		COM_CONTAINER_T		m_coms;
 		std::string			m_name;
