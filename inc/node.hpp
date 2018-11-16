@@ -90,15 +90,33 @@ namespace Light
 
 	public: // as a node
 		/**
-		* @brief get the name of this node
+		* @brief get the name of this node.
 		*/
 		std::string get_name() const;
 
+		/**
+		 * @brief add a component into this node.
+		 */
 		void add_component(
 			const std::string& name,
 			const std::shared_ptr<NodeComponent>& component);
 
+		/**
+		 * @brief remove a component
+		 */
 		void remove_component(const std::string& name);
+
+		/**
+		 * @brief get transform
+		 * @retval a 4x4 matrix
+		 */
+		const Math::Matrix4& get_transform() const;
+
+		/**
+		 * @brief set transform
+		 * @param a 4x4 matrix
+		 */
+		void set_transform(const Math::Matrix4& mtrx);
 
 		NodeComponent* get_component(
 			const std::string& name) const;
@@ -111,6 +129,7 @@ namespace Light
 			COM_CONTAINER_T;
 
 	protected:
+		Math::AABBox		m_aabbox;
 		Math::Matrix4		m_transform;
 		CHILD_CONTAINER_T	m_children;
 		COM_CONTAINER_T		m_coms;
@@ -227,5 +246,15 @@ namespace Light
 		const std::string& name) const
 	{
 		return m_coms.at(name).get();
+	}
+
+	inline const Math::Matrix4& Node::get_transform() const
+	{
+		return m_transform;
+	}
+
+	inline void Node::set_transform(const Math::Matrix4& mtrx)
+	{
+		m_transform = mtrx;
 	}
 }
