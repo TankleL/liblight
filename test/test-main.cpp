@@ -7,33 +7,55 @@
 #include "../inc/tree.hpp"
 #include "../inc/readers/reader-simple.hpp"
 
+#include "../tools/glfw/deps/glad/glad.h"
+#include "../tools/glfw/include/GLFW/glfw3.h"
+
+
 using namespace std;
 using namespace Light;
 using namespace Light::Math;
 
 int main(int argc, char** argv)
 {
-	TileScene scn;
-	RdrrPathTracing rdr(400, 5);
-	Texture2D rt(Math::Resolution(640, 360));
 
-	shared_ptr<DefaultCamera> cam = make_shared<DefaultCamera>(16, 9, 6);
-	cam->move_z(-1.1);
-	rdr.set_camera(cam);
+	//TileScene scn;
+	//RdrrPathTracing rdr(400, 5);
+	//Texture2D rt(Math::Resolution(640, 360));
 
-	if (SimpleReader::parse_json(scn, "../../test/data/cornell-box.json"))
+	//shared_ptr<DefaultCamera> cam = make_shared<DefaultCamera>(16, 9, 6);
+	//cam->move_z(-1.1);
+	//rdr.set_camera(cam);
+
+	//if (SimpleReader::parse_json(scn, "../../test/data/cornell-box.json"))
+	//{
+	//	const int frame_count = 1;
+	//	for (int i = 0; i < frame_count; ++i)
+	//	{
+	//		rdr.render(rt, scn);
+	//		std::ostringstream oss;
+	//		oss << "output-" << i << ".ppm";
+	//		ImgUtil::save_texture_as_ppm6(oss.str(), rt);
+
+	//		cam->move_z(0.1);
+	//	}
+	//}
+
+
+	glfwInit();
+	GLFWwindow* wnd = glfwCreateWindow(800, 600, "Test Liblight", nullptr, nullptr);
+	glfwMakeContextCurrent(wnd);
+
+	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	
+	while (!glfwWindowShouldClose(wnd))
 	{
-		const int frame_count = 1;
-		for (int i = 0; i < frame_count; ++i)
-		{
-			rdr.render(rt, scn);
-			std::ostringstream oss;
-			oss << "output-" << i << ".ppm";
-			ImgUtil::save_texture_as_ppm6(oss.str(), rt);
-
-			cam->move_z(0.1);
-		}
+		glClear(GL_COLOR_BUFFER_BIT);
+		glfwSwapBuffers(wnd);
+		glfwPollEvents();
 	}
+
+	glfwTerminate();
+
 
 	return 0;
 }

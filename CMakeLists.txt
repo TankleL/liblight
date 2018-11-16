@@ -9,11 +9,18 @@ add_definitions (-std=c++11)
 include_directories(inc)
 aux_source_directory (src DIR_SRCS)
 
+add_subdirectory(tools/glfw)
 add_subdirectory(test)
 
+#-------------------------------------------------------------------#
+#                             liblight                              #
+#-------------------------------------------------------------------#
 add_library (light SHARED ${DIR_SRCS})
 
 
+#-------------------------------------------------------------------#
+#                             install                               #
+#-------------------------------------------------------------------#
 install(TARGETS light DESTINATION lib)
 install(DIRECTORY inc/ DESTINATION inc/)
 install(DIRECTORY tools/math/inc/ DESTINATION tools/math/inc/)
