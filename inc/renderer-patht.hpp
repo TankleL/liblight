@@ -30,6 +30,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 *******************************************************************************/
 
+#pragma once
+
 #include "prerequisites.hpp"
 #include "scene.hpp"
 #include "renderer.hpp"
@@ -47,15 +49,15 @@ namespace Light
 		virtual void render(Texture2D& output, const Scene& scene) override;
 
 	public:
-		void set_camera(std::shared_ptr<Camera> camera);
+		void set_camera(Camera* camera);
 
 	protected:
 		Math::Color _radiance(const Scene& scene, const Math::Ray3& ray_in, int depth);
 
 	protected:
-		std::shared_ptr<Camera>	m_camera;
-		int	m_max_radiance_depth;
-		int m_sample_scale;
+		Camera*	m_camera;
+		int		m_max_radiance_depth;
+		int		m_sample_scale;
 
 	protected:
 		Math::Color m_back_clr;

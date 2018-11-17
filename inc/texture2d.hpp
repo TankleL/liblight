@@ -43,16 +43,17 @@ namespace Light
 	public:
 		Math::Resolution get_resolution() const;
 		Math::Color get_pixel(int x, int y) const;
+		const Light::byte* get_buffer() const;
 		void set_pixel(int x, int y, const Math::Color& value);
 			
 	protected:
 		Math::Resolution				m_resolution;
-		std::unique_ptr<Math::Color>	m_p_pixels;
+		Light::byte*					m_p_pixels;		// R8G8B8 format, align = 1.
 	};
 
 	inline Texture2D::Texture2D(const Math::Resolution& resolution) :
 		m_resolution(resolution),
-		m_p_pixels(new Math::Color[resolution.get_width() * resolution.get_height()])
+		m_p_pixels(new Light::byte[resolution.get_width() * resolution.get_height() * 3])  // R8G8B8 format, align = 1.
 	{}
 
 	inline Texture2D::~Texture2D()
@@ -69,7 +70,14 @@ namespace Light
 		assert(x >= 0 && x <= m_resolution.get_width());
 		assert(y >= 0 && y <= m_resolution.get_height());
 
-		return m_p_pixels.get()[x + y * m_resolution.get_width()];
+		Light::byte* p_pixel = m_p_pixels + (x + y * m_resolution.get_width()) * 3;
+
+		return Math::Color(p_pixel[0], p_pixel[1], p_pixel[2]);
+	}
+
+	inline const Light::byte* Texture2D::get_buffer() const
+	{
+		return m_p_pixels;
 	}
 
 	inline void Texture2D::set_pixel(int x, int y, const Math::Color& value)
@@ -78,6 +86,9 @@ namespace Light
 		assert(x >= 0 && x <= m_resolution.get_width());
 		assert(y >= 0 && y <= m_resolution.get_height());
 
-		m_p_pixels.get()[x + y * m_resolution.get_width()] = value;
+		Light::byte* p_pixel = m_p_pixels + (x + y * m_resolution.get_width()) * 3;
+		p_pixel[0] = value.m_r * 255;
+		p_pixel[1] = value.m_g * 255;
+		p_pixel[2] = value.m_b * 255;
 	}
 }

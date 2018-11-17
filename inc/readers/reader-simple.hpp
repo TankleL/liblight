@@ -27,6 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
+#pragma once
+
 #include "prerequisites.hpp"
 #include "scene-tile.hpp"
 #include "material-default.hpp"

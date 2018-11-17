@@ -27,9 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
-
-#if !defined(LIGHT_MATHINC_RESOLUTION_H)
-#define LIGHT_MATHINC_RESOLUTION_H
+#pragma once
 
 #include "my-prerequisites.h"
 
@@ -121,5 +119,3 @@ namespace Light
 		}
 	}
 }
-
-#endif // LIGHT_MATHINC_RESOLUTION_H

@@ -26,10 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
-
-
-#if !defined(LIGHT_MATHINC_H)
-#define LIGHT_MATHINC_H
+#pragma once
 
 #include "my-prerequisites.h"
 #include "color.h"
@@ -48,5 +45,3 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "shape-rectangle.h"
 #include "random.h"
 #include "math-utils.h"
-
-#endif // LIGHT_MATHINC_H

@@ -15,15 +15,15 @@ endif()
 
 include_directories("${GLFW_SOURCE_DIR}/deps")
 
+set(INCS "test-app.hpp")
 
 set(GLAD "${GLFW_SOURCE_DIR}/deps/glad/glad.h"
          "${GLFW_SOURCE_DIR}/deps/glad.c")				
 
-				
 #-------------------------------------------------------------------#
 #                           test liblight                           #
 #-------------------------------------------------------------------#
 aux_source_directory(. SRCS)
 add_definitions (-std=c++11)
-add_executable(test ${SRCS} ${GLAD})
+add_executable(test ${INCS} ${SRCS} ${GLAD})
 target_link_libraries(test light)

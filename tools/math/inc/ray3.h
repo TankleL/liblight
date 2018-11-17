@@ -27,9 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
-
-#if !defined(LIGHT_MATHINC_RAY3_H)
-#define LIGHT_MATHINC_RAY3_H
+#pragma once
 
 #include "my-prerequisites.h"
 #include "vector3.h"
@@ -119,6 +117,3 @@ namespace Light
 
 	} // namespace Math
 } // namespace Light
-
-
-#endif // LIGHT_MATHINC_RAY3_H

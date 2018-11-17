@@ -27,9 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
-
-#if !defined(LIGHT_MATHINC_SHAPE_H)
-#define LIGHT_MATHINC_SHAPE_H
+#pragma once
 
 #include "my-prerequisites.h"
 #include "intersection.h"
@@ -45,6 +43,3 @@ namespace Light
 		};
 	} // namespace Math
 } // namespace Light
-
-
-#endif // LIGHT_MATHINC_SHAPE_H

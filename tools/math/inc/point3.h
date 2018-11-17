@@ -27,8 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
-#if !defined(LIGHT_MATHINC_POINT3_H)
-#define LIGHT_MATHINC_POINT3_H
+#pragma once
 
 #include "my-prerequisites.h"
 
@@ -153,7 +152,4 @@ namespace Light
 				left.m_z - right.m_z);
 		}
 	} // namespace Math
-} // namespace Spears
-
-
-#endif // LIGHT_MATHINC_POINT3_H
+} // namespace Light

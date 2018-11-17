@@ -121,11 +121,12 @@ namespace RdrrPathTracingUtil
 
 RdrrPathTracing::RdrrPathTracing(int sample_scale,
 	int max_radiance_depth)
-	: m_sample_scale(sample_scale)
+	: m_camera(nullptr)
+	, m_sample_scale(sample_scale)
 	, m_max_radiance_depth(max_radiance_depth)
 {}
 
-void RdrrPathTracing::set_camera(std::shared_ptr<Camera> camera)
+void RdrrPathTracing::set_camera(Camera* camera)
 {
 	m_camera = camera;
 }

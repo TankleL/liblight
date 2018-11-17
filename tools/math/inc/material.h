@@ -27,9 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
-
-#if !defined(LIGHT_MATHINC_MATERIAL_H)
-#define LIGHT_MATHINC_MATERIAL_H
+#pragma once
 
 #include "my-prerequisites.h"
 #include "color.h"
@@ -87,5 +85,3 @@ namespace Light
 		{ return Phong; }
 	}
 }
-
-#endif

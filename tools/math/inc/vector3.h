@@ -27,9 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
-
-#if !defined(LIGHT_MATHINC_VECTOR3_H)
-#define LIGHT_MATHINC_VECTOR3_H
+#pragma once
 
 #include "my-prerequisites.h"
 
@@ -226,6 +224,4 @@ namespace Light
 			return res;
 		}
 	} // namespace Math
-} // namespace Spears
-
-#endif // LIGHT_MATHINC_VECTOR3_H
+} // namespace Light

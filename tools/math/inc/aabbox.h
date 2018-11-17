@@ -27,8 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
-#if !defined(LIGHT_MATHINC_AABBOX_H)
-#define LIGHT_MATHINC_AABBOX_H
+#pragma once
 
 namespace Light
 {
@@ -279,6 +278,4 @@ namespace Light
 			return m_tmax;
 		}
 	} //namespace Math
-} // namespace LIGHT
-
-#endif // LIGHT_MATHINC_AABBOX_H
+} // namespace Light

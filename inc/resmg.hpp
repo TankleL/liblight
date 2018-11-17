@@ -27,11 +27,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************** */
 
+#pragma once
 
 #include "prerequisites.hpp"
 #include "tree.hpp"
-
-#pragma once
 
 namespace Light
 {
