@@ -17,12 +17,7 @@ include_directories("${GLFW_SOURCE_DIR}/deps")
 
 
 set(GLAD "${GLFW_SOURCE_DIR}/deps/glad/glad.h"
-         "${GLFW_SOURCE_DIR}/deps/glad.c")
-set(GETOPT "${GLFW_SOURCE_DIR}/deps/getopt.h"
-           "${GLFW_SOURCE_DIR}/deps/getopt.c")
-set(TINYCTHREAD "${GLFW_SOURCE_DIR}/deps/tinycthread.h"
-                "${GLFW_SOURCE_DIR}/deps/tinycthread.c")
-				
+         "${GLFW_SOURCE_DIR}/deps/glad.c")				
 
 				
 #-------------------------------------------------------------------#
