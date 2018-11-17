@@ -7,6 +7,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_definitions (-std=c++11)
 include_directories(inc)
+FILE(GLOB_RECURSE HPP_LIST "inc/*.hpp")
 aux_source_directory (src DIR_SRCS)
 
 add_subdirectory(tools/glfw)
@@ -15,7 +16,7 @@ add_subdirectory(test)
 #-------------------------------------------------------------------#
 #                             liblight                              #
 #-------------------------------------------------------------------#
-add_library (light SHARED ${DIR_SRCS})
+add_library (light SHARED ${DIR_SRCS} ${HPP_LIST})
 
 
 #-------------------------------------------------------------------#
