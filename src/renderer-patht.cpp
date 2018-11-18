@@ -31,7 +31,6 @@ SOFTWARE.
 *******************************************************************************/
 
 #include "api-dev-mod.hpp"
-#include "../tools/math/inc/mathinc.h"
 #include "../inc/renderer-patht.hpp"
 #include "../inc/material-default.hpp"
 
@@ -39,85 +38,6 @@ SOFTWARE.
 
 using namespace Light;
 using namespace Light::Math;
-
-namespace RdrrPathTracingUtil
-{
-	struct DoubleRay
-	{
-		DoubleRay()
-			: valid_ray_count(0)
-		{}
-
-		Math::Ray3 r1;
-		Math::Ray3 r2;
-
-		int valid_ray_count;
-	};
-
-	inline Math::Ray3 random_ray(
-		const Math::Vector3& normal,
-		const Math::Point3& hit_pos)
-	{
-		const decimal ra = d_pi * DecimalRandom::dice();
-		const decimal rb = DecimalRandom::dice();
-		const decimal rb_sqrt = sqrt(rb);
-
-		const Vector3& w = normal;
-		Vector3 u = (abs(normal.m_x) > 0.1 ? Vector3(0, 1, 0) : Vector3(1, 0, 0)).cross(w);
-		u.normalize();
-		Vector3 v = w.cross(u);
-		Vector3 dir = u * cos(ra)*rb_sqrt + v * sin(ra)*rb_sqrt + w * sqrt(1 - rb);
-		dir.normalize();
-		return Ray3(hit_pos + dir * epsilon, dir);
-	}
-
-	inline Math::Ray3 reflect_ray(
-		const Math::Ray3& ray_in,
-		const Math::Point3& hit_point,
-		const Math::Vector3& normal)
-	{
-		Vector3 dir = ray_in.m_direction - normal * 2 * normal.dot(ray_in.m_direction);
-		return Ray3(hit_point + dir * epsilon, dir);
-	}
-
-	inline DoubleRay refract_ray(
-		decimal ior,
-		const Math::Ray3& ray_in,
-		const Math::Point3& hit_point,
-		const Math::Vector3& nr)
-	{
-		DoubleRay out;
-
-		const decimal idn = ray_in.m_direction.dot(nr);
-		const decimal cost_sq = 1.0 - (ior * ior) * (1 - idn * idn);
-
-		if (cost_sq < 0) // Total internal reflection
-		{
-			out.valid_ray_count = 1;
-			out.r1 = reflect_ray(ray_in, hit_point, nr);
-		}
-		else
-		{
-			out.valid_ray_count = 2;
-			out.r1 = reflect_ray(ray_in, hit_point, nr);
-
-			out.r2.m_direction =
-				ior * ray_in.m_direction -
-				nr * (ior * idn + sqrt(cost_sq));
-			out.r2.m_direction.normalize();
-			out.r2.m_origin = hit_point + out.r2.m_direction * epsilon;
-		}
-
-		return out;
-	}
-
-	inline decimal pixel_turbulent(decimal range = 1.0)
-	{
-		const decimal half_range = range * 0.5;
-		decimal r = DecimalRandom::dice(range) - half_range;
-		return (r >= 0 ? -r : r) + half_range;
-	}
-}
 
 RdrrPathTracing::RdrrPathTracing(int sample_scale,
 	int max_radiance_depth)

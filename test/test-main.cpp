@@ -8,6 +8,7 @@
 #include "../tools/glfw/deps/glad/glad.h"
 #include "../tools/glfw/include/GLFW/glfw3.h"
 
+TestApp test_app;
 
 using namespace std;
 using namespace Light;
@@ -51,27 +52,35 @@ int main(int argc, char** argv)
 	glEnable(GL_TEXTURE_2D);
 	GLuint sprite_program = gen_sprite_program();
 	GLuint rt_texture = gen_rt_texture();
-	TestApp test_app;
+	
 	if (!test_app.init())
 	{
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
 
-	GLuint cs = gen_cs_program();
+	GLuint cs_program = gen_cs_program();
 
 	int fb_width;
 	int fb_height;
+	float frame = 0;
 	while (!glfwWindowShouldClose(wnd))
 	{
 		glfwGetFramebufferSize(wnd, &fb_width, &fb_height);
 		glViewport(0, 0, fb_width, fb_height);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		//glUseProgram(cs_program);
+		//GLint loc_roll = glGetUniformLocation(cs_program, "roll");
+		//glUniform1f(loc_roll, frame);
+		//glDispatchCompute(16, 16, 1);
+
+
 		main_loop(sprite_program, rt_texture, test_app);
 
 		glfwSwapBuffers(wnd);
 		glfwPollEvents();
+		frame += 0.2f;
 	}
 
 	glfwTerminate();
@@ -102,6 +111,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	else if (key >= GLFW_KEY_A && key <= GLFW_KEY_Z && action == GLFW_PRESS)
+		test_app.on_press_key_alphabet('a' + key - GLFW_KEY_A);
 }
 
 static bool create_shader(GLuint& out_shader, string* out_err_log, GLenum shader_type, const string& shader_file)
@@ -232,8 +243,8 @@ static void main_loop(GLuint sprite_program, GLuint rt_texture, TestApp& test_ap
 {
 	glUseProgram(sprite_program);
 	
-//	test_app.draw();
-//	update_rt_texture(rt_texture, test_app.get_rt_texture());
+	test_app.draw();
+	update_rt_texture(rt_texture, test_app.get_rt_texture());
 	glBindTexture(GL_TEXTURE_2D, rt_texture);
 	glDrawArrays(GL_QUADS, 0, 4);
 }
