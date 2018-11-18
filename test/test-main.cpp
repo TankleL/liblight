@@ -13,10 +13,13 @@ using namespace std;
 using namespace Light;
 using namespace Light::Math;
 
+static bool load_file_string(string& out, const string& filename);
 static void error_callback(int error, const char* description);
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+static bool create_shader(GLuint& out_shader, string* out_err_log, GLenum shader_type, const string& shader_file);
 static GLuint gen_sprite_program();
 static GLuint gen_rt_texture();
+static GLuint gen_cs_program();
 static void update_rt_texture(GLuint tex, const Light::Texture2D* src_tex);
 static void main_loop(GLuint sprite_program, GLuint rt_texture, TestApp& test_app);
 
@@ -55,6 +58,8 @@ int main(int argc, char** argv)
 		exit(EXIT_FAILURE);
 	}
 
+	GLuint cs = gen_cs_program();
+
 	int fb_width;
 	int fb_height;
 	while (!glfwWindowShouldClose(wnd))
@@ -75,6 +80,19 @@ int main(int argc, char** argv)
 	return 0;
 }
 
+static bool load_file_string(string& out, const string& filename)
+{
+	// Vertex Shader
+	ifstream infile(filename);
+	if (!infile.is_open())
+		return false;
+	stringstream ss;
+	ss << infile.rdbuf();
+	out = ss.str();
+	infile.close();
+	return true;
+}
+
 static void error_callback(int error, const char* description)
 {
 	fprintf(stderr, "Error: %s\n", description);
@@ -84,6 +102,39 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
+
+static bool create_shader(GLuint& out_shader, string* out_err_log, GLenum shader_type, const string& shader_file)
+{
+	bool res(false);
+	string src;
+	if (load_file_string(src, shader_file))
+	{
+		const char* src_cstr = src.c_str();
+		out_shader = glCreateShader(shader_type);
+		glShaderSource(out_shader, 1, &src_cstr, nullptr);
+		glCompileShader(out_shader);
+
+		int rvalue;
+		glGetShaderiv(out_shader, GL_COMPILE_STATUS, &rvalue);
+		if (!rvalue)
+		{
+			GLchar log[10240];
+			GLsizei len;
+			glGetShaderInfoLog(out_shader, sizeof(log) - 1, &len, log);
+			if (out_err_log)
+			{
+				out_err_log->clear();
+				out_err_log->append(log);
+			}
+		}
+		else
+		{
+			res = true;
+		}
+	}
+
+	return res;
 }
 
 static GLuint gen_sprite_program()
@@ -108,32 +159,17 @@ static GLuint gen_sprite_program()
 	glBindBuffer(GL_ARRAY_BUFFER, vb);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+	string err_log;
 
 	// Vertex Shader
-	ifstream infile("../../test/shader/sprite_vs.glsl");
-	if (!infile.is_open())
+	GLuint vs;
+	if (!create_shader(vs, &err_log, GL_VERTEX_SHADER, "../../test/shader/sprite_vs.glsl"))
 		return -1;
-	stringstream ss_vs;
-	ss_vs << infile.rdbuf();
-	string vs_str = ss_vs.str();
-	const char* vs_text = vs_str.c_str();
-	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vs, 1, &vs_text, nullptr);
-	glCompileShader(vs);
-	infile.close();
 
 	// Fregment Shader (Pixel Shader)
-	infile.open("../../test/shader/sprite_fs.glsl");
-	if (!infile.is_open())
+	GLuint fs;
+	if (!create_shader(fs, &err_log, GL_FRAGMENT_SHADER, "../../test/shader/sprite_fs.glsl"))
 		return -2;
-	stringstream ss_fs;
-	ss_fs << infile.rdbuf();
-	string fs_str = ss_fs.str();
-	const char* fs_text = fs_str.c_str();
-	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fs, 1, &fs_text, nullptr);
-	glCompileShader(fs);
-	infile.close();
 
 	// Sprite Program
 	GLuint program = glCreateProgram();
@@ -169,6 +205,21 @@ static GLuint gen_rt_texture()
 	return tex;
 }
 
+static GLuint gen_cs_program()
+{
+	GLuint program = glCreateProgram();
+	GLuint cs;
+	string err_log;
+	if (!create_shader(cs, &err_log, GL_COMPUTE_SHADER, "../../test/shader/test_cs.glsl"))
+	{
+		cout << "error: " << err_log << endl;
+		return -1;
+	}
+
+	glAttachShader(program, cs);
+	return program;
+}
+
 static void update_rt_texture(GLuint tex, const Light::Texture2D* src_tex)
 {
 	Light::Math::Resolution reso = src_tex->get_resolution();
@@ -181,8 +232,8 @@ static void main_loop(GLuint sprite_program, GLuint rt_texture, TestApp& test_ap
 {
 	glUseProgram(sprite_program);
 	
-	test_app.draw();
-	update_rt_texture(rt_texture, test_app.get_rt_texture());
+//	test_app.draw();
+//	update_rt_texture(rt_texture, test_app.get_rt_texture());
 	glBindTexture(GL_TEXTURE_2D, rt_texture);
 	glDrawArrays(GL_QUADS, 0, 4);
 }
