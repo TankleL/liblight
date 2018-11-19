@@ -31,7 +31,7 @@ TestApp::~TestApp()
 
 bool TestApp::init()
 {
-	Math::Resolution resolution = Math::Resolution(200, 100);
+	Math::Resolution resolution = Math::Resolution(300, 150);
 
 	m_scene = new TileScene();
 	m_renderer = new RdrrIterablePathTracing(resolution, 2);

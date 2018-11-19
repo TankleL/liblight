@@ -46,6 +46,8 @@ namespace Light
 			int max_radiance_depth = 8
 		);
 
+		virtual ~RdrrIterablePathTracing();
+
 	public:
 		virtual void render(Texture2D& output, const Scene& scene) override;
 		
@@ -53,8 +55,13 @@ namespace Light
 		void flush();
 
 	protected:
-		Texture2D	m_rt_buffer;		// render target buffer
-		uint32		m_iterate;
+		void _write_pixel(int x, int y, const Math::Color& pixel);
+		const Math::Color& _get_pixel(int x, int y) const;
+
+	protected:
+		Math::Resolution	m_resolution;
+		Math::Color*		m_rt_buffer;
+		uint32				m_iterate;
 	};
 }
 

@@ -73,9 +73,9 @@ namespace Light
 		Light::byte* p_pixel = m_p_pixels + (x + y * m_resolution.get_width()) * 3;
 
 		Math::Color reval;
-		reval.m_r = (float)p_pixel[0] / 255.0f;
-		reval.m_g = (float)p_pixel[1] / 255.0f;
-		reval.m_b = (float)p_pixel[2] / 255.0f;
+		reval.m_r = ((Math::decimal)p_pixel[0]) / 255.0f;
+		reval.m_g = ((Math::decimal)p_pixel[1]) / 255.0f;
+		reval.m_b = ((Math::decimal)p_pixel[2]) / 255.0f;
 
 		return reval;
 	}

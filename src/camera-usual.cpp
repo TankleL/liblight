@@ -46,6 +46,8 @@ UsualCamera::UsualCamera(
 		filmplane_width,
 		filmplane_height,
 		filmplane_depth)
+	, m_lens_focus(focus)
+	, m_lens_aperture_radius(aperture_radius)
 {}
 
 UsualCamera::~UsualCamera()
@@ -66,6 +68,8 @@ void UsualCamera::generate_ray(Math::Ray3& cray, Math::decimal x_offset, Math::d
 	dir += up_bias;
 	dir.normalize();
 
+	cray.m_origin = m_position + m_up * DecimalRandom::dice(m_lens_aperture_radius);
+	
 	Math::Point3 pf = m_position + m_look * m_lens_focus;	// focus point
 
 	// set origin of ray.

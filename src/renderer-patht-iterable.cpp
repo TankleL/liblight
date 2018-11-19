@@ -42,25 +42,35 @@ RdrrIterablePathTracing::RdrrIterablePathTracing(
 	const Math::Resolution& resolution,
 	int max_radiance_depth /* = 8 */)
 	: RdrrPathTracing(1, max_radiance_depth)
-	, m_rt_buffer(resolution)
+	, m_rt_buffer(nullptr)
+	, m_resolution(resolution)
 	, m_iterate(0)
-{}
+{
+	m_rt_buffer = new Color[resolution.get_width() * resolution.get_height()];
+}
+
+RdrrIterablePathTracing::~RdrrIterablePathTracing()
+{
+	safe_delete(m_rt_buffer);
+}
 
 void RdrrIterablePathTracing::render(Texture2D& output, const Scene& scene)
 {
 	using namespace RdrrPathTracingUtil;
 
-	assert(output.get_resolution() == m_rt_buffer.get_resolution());
+	assert(output.get_resolution() == m_resolution);
 
-	const decimal rw = (decimal)output.get_resolution().get_width();
-	const decimal rh = (decimal)output.get_resolution().get_height();
+	const decimal rw = (decimal)m_resolution.get_width();
+	const decimal rh = (decimal)m_resolution.get_height();
 	const decimal h_rw = rw * 0.5;
 	const decimal h_rh = rh * 0.5;
+
+	++m_iterate;
 
 	Ray3 cray(Point3(0.f, 0.f, 0.f), Vector3(0.f, 0.f, 1.f));
 	for (int y = 0; y < (int)rh; ++y)
 	{
-//#pragma omp parallel for schedule(dynamic, 1) private(cray)
+#pragma omp parallel for schedule(dynamic, 1) private(cray)
 		for (int x = 0; x < (int)rw; ++x)
 		{
 			Color pixel;
@@ -69,19 +79,21 @@ void RdrrIterablePathTracing::render(Texture2D& output, const Scene& scene)
 
 			m_camera->generate_ray(cray, px, py);
 			pixel = _radiance(scene, cray, 0);
-			pixel.clamp();
 
-			if(m_iterate)
+			if(m_iterate - 1 > 0)
 			{
-				// TODO : calculate each iteration
-				Color old = m_rt_buffer.get_pixel(x, y);
+				const Color& old = _get_pixel(x, y);
+				pixel = old - (old / (decimal)m_iterate) + (pixel / (decimal)m_iterate);
+				
+				_write_pixel(x, y, pixel);
+
+				pixel.clamp();
 				output.set_pixel(x, y, pixel);
-				m_rt_buffer.set_pixel(x, y, pixel);
 			}
 			else
 			{
 				output.set_pixel(x, y, pixel);
-				m_rt_buffer.set_pixel(x, y, pixel);
+				_write_pixel(x, y, pixel);
 			}
 		}
 	}
@@ -91,4 +103,15 @@ void RdrrIterablePathTracing::flush()
 {
 	m_iterate = 0;
 }
+
+void RdrrIterablePathTracing::_write_pixel(int x, int y, const Math::Color& pixel)
+{
+	m_rt_buffer[x + y * m_resolution.get_width()] = pixel;
+}
+
+const Math::Color& RdrrIterablePathTracing::_get_pixel(int x, int y) const
+{
+	return m_rt_buffer[x + y * m_resolution.get_width()];
+}
+
 
