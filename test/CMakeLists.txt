@@ -24,6 +24,6 @@ set(GLAD "${GLFW_SOURCE_DIR}/deps/glad/glad.h"
 #                           test liblight                           #
 #-------------------------------------------------------------------#
 aux_source_directory(. SRCS)
-add_definitions (-std=c++11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 add_executable(test ${INCS} ${SRCS} ${GLAD})
 target_link_libraries(test light)
