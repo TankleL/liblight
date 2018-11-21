@@ -5,15 +5,15 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-#add_definitions (-std=c++11)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+add_subdirectory(tools/glfw)
+add_subdirectory(test)
 
 include_directories(inc)
 FILE(GLOB_RECURSE HPP_LIST "inc/*.hpp")
 aux_source_directory (src DIR_SRCS)
 
-add_subdirectory(tools/glfw)
-add_subdirectory(test)
 
 #-------------------------------------------------------------------#
 #                             liblight                              #
