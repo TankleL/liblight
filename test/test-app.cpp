@@ -19,6 +19,7 @@ TestApp::TestApp()
 	, m_renderer(nullptr)
 	, m_texture(nullptr)
 	, m_camera(nullptr)
+	, m_is_dirty(true)
 {}
 
 TestApp::~TestApp()
@@ -34,13 +35,21 @@ bool TestApp::init()
 	Math::Resolution resolution = Math::Resolution(300, 150);
 
 	m_scene = new TileScene();
-	m_renderer = new RdrrIterablePathTracing(resolution, 2);
+	m_renderer = new RdrrIterablePathTracing(resolution, 5);
 	m_texture = new Texture2D(resolution);
 	m_camera = new DefaultCamera(16, 9, 6);
-	m_camera->move_z(-1.1);
+	m_camera->move_x(0.2f);
+	m_camera->move_z(-2.0f);
+	m_camera->move_y(-0.8f);
 	((RdrrIterablePathTracing*)m_renderer)->set_camera(m_camera);
 
-	if (!SimpleReader::parse_json(*(TileScene*)m_scene, "../../test/data/cornell-box.json"))
+	const char* test_files[] = {
+		"../../test/data/cornell-box.json",
+		"../../test/data/light-up.json",
+		"../../test/data/glass-spheres.json"
+	};
+
+	if (!SimpleReader::parse_json(*(TileScene*)m_scene, test_files[2]))
 	{
 		return false;
 	}
@@ -50,6 +59,12 @@ bool TestApp::init()
 
 void TestApp::draw()
 {
+	if (m_is_dirty)
+	{
+		((RdrrIterablePathTracing*)m_renderer)->flush();
+		m_is_dirty = false;
+	}
+
 	m_renderer->render(*m_texture, *m_scene);
 }
 
@@ -63,31 +78,37 @@ void TestApp::on_press_key_alphabet(char letter)
 	switch (letter)
 	{
 	case 'f':
-		((RdrrIterablePathTracing*)m_renderer)->flush();
+		m_is_dirty = true;
 		break;
 
 	case 'w':
 		m_camera->move_z(0.2f);
+		m_is_dirty = true;
 		break;
 
 	case 's':
 		m_camera->move_z(-0.2f);
+		m_is_dirty = true;
 		break;
 
 	case 'a':
 		m_camera->move_x(-0.2f);
+		m_is_dirty = true;
 		break;
 
 	case 'd':
 		m_camera->move_x(0.2f);
+		m_is_dirty = true;
 		break;
 
 	case 'e':
 		m_camera->move_y(0.2f);
+		m_is_dirty = true;
 		break;
 
 	case 'c':
 		m_camera->move_y(-0.2f);
+		m_is_dirty = true;
 		break;
 	}
 }

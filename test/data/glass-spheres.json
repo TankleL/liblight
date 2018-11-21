@@ -1,0 +1,128 @@
+{
+	  "mtrl_list" :
+	[
+		{
+			  "type" : "default"
+			, "name" : "white_obj"
+			, "diffuse" : [0.8, 0.8, 0.8]
+		}
+		,{
+			  "type" : "default"
+			, "name" : "blue_obj"
+			, "diffuse" : [0.4, 0.6, 0.9]
+		}
+		,{
+			  "type" : "default"
+			, "name" : "green_obj"
+			, "diffuse" : [0.2, 1, 0.4]
+		}
+		,{
+			  "type" : "default"
+			, "name" : "white_light"
+			, "emissive" : [1, 1, 1]
+		}
+		,{
+			  "type" : "default"
+			, "name" : "glass_ball"
+			, "refraction" : [1, 1, 1]
+			, "IOR" : [1.2, 1, 1]
+		}
+		,{
+			  "type" : "default"
+			, "name" : "mirror_ball"
+			, "specular" : [0.7, 0.7, 0.7]
+			, "diffuse" : [0.2, 0.2, 0.2]
+		}
+	]
+	, "shape_list" :
+	[
+		{
+			  "type" : "sphere"
+			, "mtrl" : "mirror_ball"
+			, "radius" : 0.5
+			, "pos" : [-0.8, -0.5, 1]
+			, "_comment" : "mirror ball"
+		}
+		,{
+			  "type" : "sphere"
+			, "mtrl" : "glass_ball"
+			, "radius" : 0.5
+			, "pos" : [0, -0.5, 0]
+			, "_comment" : "mirror ball"
+		}
+		,{
+			  "type" : "sphere"
+			, "mtrl" : "mirror_ball"
+			, "radius" : 0.5
+			, "pos" : [0.8, -0.5, -1]
+			, "_comment" : "mirror ball"
+		}
+		,{
+			  "type" : "sphere"
+			, "mtrl" : "glass_ball"
+			, "radius" : 0.5
+			, "pos" : [-0.8, -0.5, -1]
+			, "_comment" : "mirror ball"
+		}
+		,{
+			  "type" : "rectangle"
+			, "mtrl" : "white_light"
+			, "pos" : [
+				-100, -1, -100,
+				-100,  5, -100,
+				-100,  5,  100,
+				-100, -1,  100]
+			, "_comment" : "left"
+		}
+		,{
+			  "type" : "rectangle"
+			, "mtrl" : "white_light"
+			, "pos" : [
+				 100, -1, -100,
+				 100, -1,  100,
+				 100,  5,  100,
+				 100,  5, -100]
+			, "_comment" : "right"
+		}
+		,{
+			  "type" : "rectangle"
+			, "mtrl" : "white_light"
+			, "pos" : [
+				-100, -1, 100,
+				-100,  5, 100,
+				 100,  5, 100,
+				 100, -1, 100]
+			, "_comment" : "back"
+		}
+		,{
+			  "type" : "rectangle"
+			, "mtrl" : "white_light"
+			, "pos" : [
+				-100, -1, -100,
+				 100, -1, -100,
+				 100,  5, -100,
+				-100,  5, -100]
+			, "_comment" : "front"
+		}
+		,{
+			  "type" : "rectangle"
+			, "mtrl" : "white_light"
+			, "pos" : [
+				-100, 5, -100,
+				 100, 5, -100,
+				 100, 5,  100,
+				-100, 5,  100]
+			, "_comment" : "top"
+		}
+		,{
+			  "type" : "rectangle"
+			, "mtrl" : "blue_obj"
+			, "pos" : [
+				-100, -1, -100,
+				-100, -1,  100,
+				 100, -1,  100,
+				 100, -1, -100]
+			, "_comment" : "bottom"
+		}
+	]
+}

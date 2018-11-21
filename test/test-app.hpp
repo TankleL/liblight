@@ -26,6 +26,7 @@ protected:
 	Light::Renderer*	m_renderer;
 	Light::Texture2D*	m_texture;
 	Light::Camera*		m_camera;
+	bool				m_is_dirty;
 };
 
 
