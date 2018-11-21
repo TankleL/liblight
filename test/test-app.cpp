@@ -65,6 +65,30 @@ void TestApp::on_press_key_alphabet(char letter)
 	case 'f':
 		((RdrrIterablePathTracing*)m_renderer)->flush();
 		break;
+
+	case 'w':
+		m_camera->move_z(0.2f);
+		break;
+
+	case 's':
+		m_camera->move_z(-0.2f);
+		break;
+
+	case 'a':
+		m_camera->move_x(-0.2f);
+		break;
+
+	case 'd':
+		m_camera->move_x(0.2f);
+		break;
+
+	case 'e':
+		m_camera->move_y(0.2f);
+		break;
+
+	case 'c':
+		m_camera->move_y(-0.2f);
+		break;
 	}
 }
 
