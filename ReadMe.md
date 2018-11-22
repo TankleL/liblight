@@ -2,6 +2,7 @@
 a simple library to light up 3D scenes
 
 ![sample-img](./sample-imgs/readme-sample-img.jpg)
+![sample-img2](./sample-imgs/readme-sample-img2.jpg)
 
 ## 1. How to build
 Please use cmake to build liblight out-of-source.
